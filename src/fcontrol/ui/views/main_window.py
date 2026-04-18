@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QApplication, QMainWindow, QButtonGroup
+from PySide6.QtWidgets import QMainWindow, QButtonGroup
 
 from fcontrol.ui.qt_generated.main_window import Ui_MainWindow
 from fcontrol.ui.views import home_widget, allocation_widget, pockets_widget
@@ -8,14 +8,6 @@ class MainWindow(Ui_MainWindow, QMainWindow):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
-
-        # Get application name and version from QApplication
-        app = QApplication.instance()
-        app_name = app.applicationName()
-        app_version = app.applicationVersion()
-
-        # Set window title with app name and version
-        self.setWindowTitle(f"{app_name} {app_version}")
 
         # Setup
         self._setup_stacked_widget()
