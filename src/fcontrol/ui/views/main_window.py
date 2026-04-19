@@ -19,17 +19,17 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.allocate_widget = allocation_widget.AllocationWidget()
         self.pockets_widget = pockets_widget.PocketsWidget()
 
-        self.stacked_widget.addWidget(self.home_widget)
-        self.stacked_widget.addWidget(self.allocate_widget)
-        self.stacked_widget.addWidget(self.pockets_widget)
+        self.stackedWidget.addWidget(self.home_widget)
+        self.stackedWidget.addWidget(self.allocate_widget)
+        self.stackedWidget.addWidget(self.pockets_widget)
 
     def _setup_navigation_buttons(self):
         # Group buttons for navigation
         self.nav_button_group = QButtonGroup(self)
 
-        self.nav_button_group.addButton(self.home_button, 0)
-        self.nav_button_group.addButton(self.allocate_button, 1)
-        self.nav_button_group.addButton(self.pockets_button, 2)
+        self.nav_button_group.addButton(self.homeButton, 0)
+        self.nav_button_group.addButton(self.allocateButton, 1)
+        self.nav_button_group.addButton(self.pocketsButton, 2)
 
         # Set buttons to be checkable
         for button in self.nav_button_group.buttons():
@@ -39,10 +39,10 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.nav_button_group.setExclusive(True)
 
         # Set default checked button
-        self.home_button.setChecked(True)
+        self.homeButton.setChecked(True)
 
         # Connect button group signal to change stacked widget page
         self.nav_button_group.idClicked.connect(self._on_nav_button_clicked)
 
     def _on_nav_button_clicked(self, id):
-        self.stacked_widget.setCurrentIndex(id)
+        self.stackedWidget.setCurrentIndex(id)

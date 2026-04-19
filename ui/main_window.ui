@@ -31,7 +31,7 @@
     </property>
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
-      <widget class="QPushButton" name="home_button">
+      <widget class="QPushButton" name="homeButton">
        <property name="text">
         <string>Home</string>
        </property>
@@ -41,14 +41,14 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="allocate_button">
+      <widget class="QPushButton" name="allocateButton">
        <property name="text">
         <string>Allocate</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="pockets_button">
+      <widget class="QPushButton" name="pocketsButton">
        <property name="text">
         <string>Pockets</string>
        </property>
@@ -69,7 +69,7 @@
      </item>
     </layout>
    </widget>
-   <widget class="QStackedWidget" name="stacked_widget">
+   <widget class="QStackedWidget" name="stackedWidget">
     <property name="geometry">
      <rect>
       <x>180</x>

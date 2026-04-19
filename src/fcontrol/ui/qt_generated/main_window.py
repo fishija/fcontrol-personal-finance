@@ -33,29 +33,29 @@ class Ui_MainWindow(object):
         self.frame.setFrameShadow(QFrame.Shadow.Raised)
         self.verticalLayout = QVBoxLayout(self.frame)
         self.verticalLayout.setObjectName(u"verticalLayout")
-        self.home_button = QPushButton(self.frame)
-        self.home_button.setObjectName(u"home_button")
-        self.home_button.setChecked(False)
+        self.homeButton = QPushButton(self.frame)
+        self.homeButton.setObjectName(u"homeButton")
+        self.homeButton.setChecked(False)
 
-        self.verticalLayout.addWidget(self.home_button)
+        self.verticalLayout.addWidget(self.homeButton)
 
-        self.allocate_button = QPushButton(self.frame)
-        self.allocate_button.setObjectName(u"allocate_button")
+        self.allocateButton = QPushButton(self.frame)
+        self.allocateButton.setObjectName(u"allocateButton")
 
-        self.verticalLayout.addWidget(self.allocate_button)
+        self.verticalLayout.addWidget(self.allocateButton)
 
-        self.pockets_button = QPushButton(self.frame)
-        self.pockets_button.setObjectName(u"pockets_button")
+        self.pocketsButton = QPushButton(self.frame)
+        self.pocketsButton.setObjectName(u"pocketsButton")
 
-        self.verticalLayout.addWidget(self.pockets_button)
+        self.verticalLayout.addWidget(self.pocketsButton)
 
         self.verticalSpacer = QSpacerItem(20, 366, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
         self.verticalLayout.addItem(self.verticalSpacer)
 
-        self.stacked_widget = QStackedWidget(self.centralwidget)
-        self.stacked_widget.setObjectName(u"stacked_widget")
-        self.stacked_widget.setGeometry(QRect(180, 10, 561, 511))
+        self.stackedWidget = QStackedWidget(self.centralwidget)
+        self.stackedWidget.setObjectName(u"stackedWidget")
+        self.stackedWidget.setGeometry(QRect(180, 10, 561, 511))
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
@@ -72,8 +72,8 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))
-        self.home_button.setText(QCoreApplication.translate("MainWindow", u"Home", None))
-        self.allocate_button.setText(QCoreApplication.translate("MainWindow", u"Allocate", None))
-        self.pockets_button.setText(QCoreApplication.translate("MainWindow", u"Pockets", None))
+        self.homeButton.setText(QCoreApplication.translate("MainWindow", u"Home", None))
+        self.allocateButton.setText(QCoreApplication.translate("MainWindow", u"Allocate", None))
+        self.pocketsButton.setText(QCoreApplication.translate("MainWindow", u"Pockets", None))
     # retranslateUi
 
