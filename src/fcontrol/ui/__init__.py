@@ -3,7 +3,14 @@ from .views import (
     HomeWidget,
     AllocationWidget,
     PocketsWidget,
+    PocketEditDialog,
 )
 
 
-__all__ = ["MainWindow", "HomeWidget", "AllocationWidget", "PocketsWidget"]
+__all__ = [
+    "MainWindow",
+    "HomeWidget",
+    "AllocationWidget",
+    "PocketsWidget",
+    "PocketEditDialog",
+]

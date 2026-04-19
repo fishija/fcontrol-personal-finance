@@ -1,5 +1,5 @@
-from fcontrol.ui.views import PocketsWidget
-from fcontrol.models.pocket import PocketRepository, Pocket
+from fcontrol.ui import PocketsWidget, PocketEditDialog
+from fcontrol.models import PocketRepository, Pocket
 
 
 class PocketController:
@@ -12,6 +12,7 @@ class PocketController:
 
     def _connect_signals(self):
         self.view.add_request.connect(self._on_add)
+        self.view.edit_request.connect(self._on_edit)
         self.view.delete_request.connect(self._on_delete)
 
     def _on_add(self, name: str, balance: float, currency: str):
@@ -20,6 +21,22 @@ class PocketController:
         print(f"insert pocket: {new_pocket}")
 
         self.refresh()
+
+    def _on_edit(self, pocket_id: int):
+        pocket = self.repository.get_by_id(pocket_id)
+        if not pocket:
+            print(f"Pocket with ID {pocket_id} not found.")
+            return
+
+        dialog = PocketEditDialog(pocket)
+        if dialog.exec():
+            new_values = dialog.get_values()
+            pocket.name = new_values["name"]
+            pocket.balance = new_values["balance"]
+            pocket.currency = new_values["currency"]
+
+            self.repository.update(pocket)
+            self.refresh()
 
     def _on_delete(self, pocket_id: int):
         print(f"Delete pocket with ID: {pocket_id}")

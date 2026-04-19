@@ -2,12 +2,13 @@ from PySide6.QtWidgets import QWidget, QTableWidget, QTableWidgetItem, QMessageB
 from PySide6.QtCore import Qt, Signal
 
 from fcontrol.ui.qt_generated.pockets_widget import Ui_PocketsWidget
-from fcontrol.models.pocket import Pocket
+from fcontrol.models import Pocket
 from fcontrol.config import CURRENCIES
 
 
 class PocketsWidget(Ui_PocketsWidget, QWidget):
     add_request = Signal(str, float, str)  # pocket name, balance, currency
+    edit_request = Signal(int)  # pocket id
     delete_request = Signal(int)  # pocket id
 
     def __init__(self):
@@ -102,12 +103,12 @@ class PocketsWidget(Ui_PocketsWidget, QWidget):
             self.delete_request.emit(pocket_id)
 
     def _on_edit_clicked(self):
-        # TODO: emit edit request with selected pocket ID
-        pass
+        pocket_id = self._get_selected_pocket_id()
+        if pocket_id is not None:
+            self.edit_request.emit(pocket_id)
 
-    def _on_double_clicked(self, item):
-        # TODO: emit edit request with selected pocket ID
-        pass
+    def _on_double_clicked(self):
+        self._on_edit_clicked()
 
     def populate_table(self, pockets: list[Pocket]):
         self.pocketsTable.setRowCount(0)
