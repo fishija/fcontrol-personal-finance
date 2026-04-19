@@ -24,6 +24,19 @@ class PocketRepository:
             for r in rows
         ]
 
+    def get_by_id(self, pocket_id: int) -> Pocket | None:
+        row = self.db.fetch_one(
+            "SELECT id, name, balance, currency FROM pockets WHERE id = ?", (pocket_id,)
+        )
+        if row:
+            return Pocket(
+                id=row["id"],
+                name=row["name"],
+                balance=row["balance"],
+                currency=row["currency"],
+            )
+        return None
+
     def insert(self, pocket: Pocket) -> Pocket:
         pocket.id = self.db.execute(
             "INSERT INTO pockets (name, balance, currency) VALUES (?, ?, ?)",
