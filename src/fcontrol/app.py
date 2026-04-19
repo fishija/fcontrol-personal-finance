@@ -1,0 +1,47 @@
+import atexit
+from PySide6.QtWidgets import QApplication
+from fcontrol.config import APP_NAME, APP_VERSION, DB_PATH
+from fcontrol.db_manager import DatabaseManager
+from fcontrol.ui import MainWindow, HomeWidget, AllocationWidget, PocketsWidget
+
+
+class Application:
+    def __init__(self, argv):
+        self.qt_app = QApplication(argv)
+        self.qt_app.setApplicationName(APP_NAME)
+        self.qt_app.setApplicationVersion(APP_VERSION)
+
+        self._setup_database()
+        self._setup_repositories()
+        self._setup_views()
+        self._setup_controllers()
+        self._setup_main_window()
+
+    def _setup_database(self):
+        self.db = DatabaseManager(DB_PATH)
+        atexit.register(self.db.close)
+
+    def _setup_repositories(self):
+        # TODO
+        pass
+
+    def _setup_views(self):
+        self.home_widget = HomeWidget()
+        self.allocation_widget = AllocationWidget()
+        self.pockets_widget = PocketsWidget()
+
+    def _setup_controllers(self):
+        # TODO
+        pass
+
+    def _setup_main_window(self):
+        self.main_window = MainWindow(
+            home_widget=self.home_widget,
+            allocation_widget=self.allocation_widget,
+            pockets_widget=self.pockets_widget,
+        )
+        self.main_window.setWindowTitle(f"{APP_NAME} {APP_VERSION}")
+
+    def run(self) -> int:
+        self.main_window.show()
+        return self.qt_app.exec()

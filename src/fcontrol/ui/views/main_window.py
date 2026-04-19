@@ -1,27 +1,27 @@
 from PySide6.QtWidgets import QMainWindow, QButtonGroup
 
 from fcontrol.ui.qt_generated.main_window import Ui_MainWindow
-from fcontrol.ui.views import home_widget, allocation_widget, pockets_widget
 
 
 class MainWindow(Ui_MainWindow, QMainWindow):
-    def __init__(self):
+    def __init__(self, home_widget, allocation_widget, pockets_widget):
         super().__init__()
         self.setupUi(self)
 
         # Setup
-        self._setup_stacked_widget()
+        self._setup_stacked_widget(home_widget, allocation_widget, pockets_widget)
         self._setup_navigation_buttons()
 
-    def _setup_stacked_widget(self):
+    def _setup_stacked_widget(
+        self,
+        home_widget,
+        allocation_widget,
+        pockets_widget,
+    ):
         # Initialize and add widgets to the stacked widget
-        self.home_widget = home_widget.HomeWidget()
-        self.allocate_widget = allocation_widget.AllocationWidget()
-        self.pockets_widget = pockets_widget.PocketsWidget()
-
-        self.stackedWidget.addWidget(self.home_widget)
-        self.stackedWidget.addWidget(self.allocate_widget)
-        self.stackedWidget.addWidget(self.pockets_widget)
+        self.stackedWidget.addWidget(home_widget)
+        self.stackedWidget.addWidget(allocation_widget)
+        self.stackedWidget.addWidget(pockets_widget)
 
     def _setup_navigation_buttons(self):
         # Group buttons for navigation

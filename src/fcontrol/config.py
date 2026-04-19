@@ -1,10 +1,11 @@
+from importlib.metadata import version
 from platformdirs import user_data_dir
 from pathlib import Path
 import sys
 
 APP_NAME = "FControl"
 APP_AUTHOR = "fishija"
-APP_VERSION = "0.1.0"
+APP_VERSION = version(APP_NAME)
 
 # Detect environment
 IS_FROZEN = getattr(sys, "frozen", False)

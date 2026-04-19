@@ -1,23 +1,10 @@
-from PySide6.QtWidgets import QApplication
 import sys
-
-from fcontrol.ui import MainWindow
-from fcontrol.config import APP_NAME, APP_VERSION
+from fcontrol.app import Application
 
 
 def main():
-    # Initialize the Qt application
-    app = QApplication(sys.argv)
-    app.setApplicationName(APP_NAME)
-    app.setApplicationVersion(APP_VERSION)
-
-    # Create and show the main window
-    main_window = MainWindow()
-    main_window.setWindowTitle(f"{APP_NAME} {APP_VERSION}")
-    main_window.show()
-
-    # Start the application event loop
-    sys.exit(app.exec())
+    app = Application(sys.argv)
+    sys.exit(app.run())
 
 
 if __name__ == "__main__":
