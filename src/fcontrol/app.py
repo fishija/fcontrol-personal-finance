@@ -2,6 +2,8 @@ import atexit
 from PySide6.QtWidgets import QApplication
 from fcontrol.config import APP_NAME, APP_VERSION, DB_PATH
 from fcontrol.db_manager import DatabaseManager
+from fcontrol.models import PocketRepository
+from fcontrol.controllers import PocketController
 from fcontrol.ui import MainWindow, HomeWidget, AllocationWidget, PocketsWidget
 
 
@@ -22,8 +24,7 @@ class Application:
         atexit.register(self.db.close)
 
     def _setup_repositories(self):
-        # TODO
-        pass
+        self.pocket_repository = PocketRepository(self.db)
 
     def _setup_views(self):
         self.home_widget = HomeWidget()
@@ -31,8 +32,9 @@ class Application:
         self.pockets_widget = PocketsWidget()
 
     def _setup_controllers(self):
-        # TODO
-        pass
+        self.pocket_controller = PocketController(
+            self.pockets_widget, self.pocket_repository
+        )
 
     def _setup_main_window(self):
         self.main_window = MainWindow(
