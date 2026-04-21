@@ -1,9 +1,14 @@
+from PySide6.QtCore import QObject, Signal
+
 from fcontrol.ui import PocketsWidget, PocketEditDialog
 from fcontrol.models import PocketRepository, Pocket
 
 
-class PocketController:
+class PocketController(QObject):
+    pocket_repo_changed = Signal()
+
     def __init__(self, view: PocketsWidget, repository: PocketRepository):
+        super().__init__()
         self.view = view
         self.repository = repository
 
@@ -19,8 +24,8 @@ class PocketController:
         new_pocket = Pocket(name=name, balance=balance, currency=currency)
         new_pocket = self.repository.insert(new_pocket)
         print(f"insert pocket: {new_pocket}")
-
         self.refresh()
+        self.pocket_repo_changed.emit()
 
     def _on_edit(self, pocket_id: int):
         pocket = self.repository.get_by_id(pocket_id)
@@ -37,12 +42,13 @@ class PocketController:
 
             self.repository.update(pocket)
             self.refresh()
+            self.pocket_repo_changed.emit()
 
     def _on_delete(self, pocket_id: int):
         print(f"Delete pocket with ID: {pocket_id}")
         self.repository.delete(pocket_id)
-
         self.refresh()
+        self.pocket_repo_changed.emit()
 
     def refresh(self):
         pockets = self.repository.get_all()
