@@ -41,9 +41,9 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="allocateButton">
+      <widget class="QPushButton" name="allocationButton">
        <property name="text">
-        <string>Allocate</string>
+        <string>Allocation</string>
        </property>
       </widget>
      </item>

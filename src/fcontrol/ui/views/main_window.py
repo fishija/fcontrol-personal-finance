@@ -28,7 +28,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.nav_button_group = QButtonGroup(self)
 
         self.nav_button_group.addButton(self.homeButton, 0)
-        self.nav_button_group.addButton(self.allocateButton, 1)
+        self.nav_button_group.addButton(self.allocationButton, 1)
         self.nav_button_group.addButton(self.pocketsButton, 2)
 
         # Set buttons to be checkable

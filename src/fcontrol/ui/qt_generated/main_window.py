@@ -39,10 +39,10 @@ class Ui_MainWindow(object):
 
         self.verticalLayout.addWidget(self.homeButton)
 
-        self.allocateButton = QPushButton(self.frame)
-        self.allocateButton.setObjectName(u"allocateButton")
+        self.allocationButton = QPushButton(self.frame)
+        self.allocationButton.setObjectName(u"allocationButton")
 
-        self.verticalLayout.addWidget(self.allocateButton)
+        self.verticalLayout.addWidget(self.allocationButton)
 
         self.pocketsButton = QPushButton(self.frame)
         self.pocketsButton.setObjectName(u"pocketsButton")
@@ -73,7 +73,7 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))
         self.homeButton.setText(QCoreApplication.translate("MainWindow", u"Home", None))
-        self.allocateButton.setText(QCoreApplication.translate("MainWindow", u"Allocate", None))
+        self.allocationButton.setText(QCoreApplication.translate("MainWindow", u"Allocation", None))
         self.pocketsButton.setText(QCoreApplication.translate("MainWindow", u"Pockets", None))
     # retranslateUi
 
