@@ -1,12 +1,13 @@
-from PySide6.QtWidgets import QWidget, QTableWidget, QTableWidgetItem, QMessageBox
+from PySide6.QtWidgets import QTableWidget, QTableWidgetItem, QMessageBox
 from PySide6.QtCore import Qt, Signal
 
+from fcontrol.ui.views.base_widget import BaseWidget
 from fcontrol.ui.qt_generated.pockets_widget import Ui_PocketsWidget
 from fcontrol.models import Pocket
 from fcontrol.config import CURRENCIES
 
 
-class PocketsWidget(Ui_PocketsWidget, QWidget):
+class PocketsWidget(Ui_PocketsWidget, BaseWidget):
     add_request = Signal(str, float, str)  # pocket name, balance, currency
     edit_request = Signal(int)  # pocket id
     delete_request = Signal(int)  # pocket id
@@ -56,21 +57,6 @@ class PocketsWidget(Ui_PocketsWidget, QWidget):
         self.deleteButton.setEnabled(bool(selected_items))
         self.editButton.setEnabled(bool(selected_items))
 
-    def _get_selected_pocket_id(self) -> int | None:
-        selected_items = self.pocketsTable.selectedItems()
-        if not selected_items:
-            return None
-        return selected_items[0].data(Qt.ItemDataRole.UserRole)
-
-    def _ask_for_confirmation(self, message: str) -> bool:
-        reply = QMessageBox.question(
-            self,
-            "Confirm Action",
-            message,
-            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-        )
-        return reply == QMessageBox.StandardButton.Yes
-
     def _set_style_invalid(self, widget, is_invalid: bool):
         if is_invalid:
             widget.setStyleSheet("border: 1px solid red;")
@@ -92,9 +78,9 @@ class PocketsWidget(Ui_PocketsWidget, QWidget):
         self.add_request.emit(name, balance, currency)
 
     def _on_delete_clicked(self):
-        pocket_id = self._get_selected_pocket_id()
+        pocket_id = self.get_selected_row_id(self.pocketsTable)
         if pocket_id is not None:
-            confirmation = self._ask_for_confirmation(
+            confirmation = self.ask_for_confirmation(
                 "Are you sure you want to delete the selected pocket?"
             )
             if not confirmation:
@@ -103,7 +89,7 @@ class PocketsWidget(Ui_PocketsWidget, QWidget):
             self.delete_request.emit(pocket_id)
 
     def _on_edit_clicked(self):
-        pocket_id = self._get_selected_pocket_id()
+        pocket_id = self.get_selected_row_id(self.pocketsTable)
         if pocket_id is not None:
             self.edit_request.emit(pocket_id)
 
