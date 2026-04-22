@@ -44,7 +44,6 @@ class AllocationRule:
 
 class AllocationRepository:
     def __init__(self, db: DatabaseManager, pocket_repository: PocketRepository):
-        self.rules: list[AllocationRule] = []
         self.db = db
         self.pocket_repository = pocket_repository
 
@@ -62,6 +61,36 @@ class AllocationRepository:
             )
             for r in rows
         ]
+
+    def get_by_id(self, rule_id: int) -> AllocationRule | None:
+        row = self.db.fetch_one(
+            "SELECT id, pocket_id, allocation_type, value, position FROM allocation_rules WHERE id = ?",
+            (rule_id,),
+        )
+        if row:
+            return AllocationRule(
+                pocket=self.pocket_repository.get_by_id(row["pocket_id"]),
+                allocation_type=AllocationType(row["allocation_type"]),
+                value=row["value"],
+                position=row["position"],
+                id=row["id"],
+            )
+        return None
+
+    def get_by_position(self, position: int) -> AllocationRule | None:
+        row = self.db.fetch_one(
+            "SELECT id, pocket_id, allocation_type, value, position FROM allocation_rules WHERE position = ?",
+            (position,),
+        )
+        if row:
+            return AllocationRule(
+                pocket=self.pocket_repository.get_by_id(row["pocket_id"]),
+                allocation_type=AllocationType(row["allocation_type"]),
+                value=row["value"],
+                position=row["position"],
+                id=row["id"],
+            )
+        return None
 
     def insert(self, rule: AllocationRule) -> AllocationRule:
         rule.id = self.db.execute(
@@ -89,3 +118,7 @@ class AllocationRepository:
 
     def delete(self, rule_id: int) -> None:
         self.db.execute("DELETE FROM allocation_rules WHERE id = ?", (rule_id,))
+
+    def count(self) -> int:
+        row = self.db.fetch_one("SELECT COUNT(*) as count FROM allocation_rules")
+        return row["count"] if row else 0
