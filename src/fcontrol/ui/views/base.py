@@ -6,9 +6,20 @@ class BaseObject:
     def __init__(self):
         pass
 
-    def _set_label(self, label: QLabel, message: str, is_error: bool = False):
+    def _set_label(
+        self,
+        label: QLabel,
+        message: str,
+        is_success: bool = False,
+        is_warning: bool = False,
+        is_error: bool = False,
+    ):
         label.setText(message)
-        if is_error:
+        if is_success:
+            label.setStyleSheet("color: green;")
+        elif is_warning:
+            label.setStyleSheet("color: orange;")
+        elif is_error:
             label.setStyleSheet("color: red;")
         else:
             label.setStyleSheet("")
