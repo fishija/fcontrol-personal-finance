@@ -20,10 +20,6 @@ class PocketsWidget(Ui_PocketsWidget, BaseWidget):
         self._setup_table()
         self._connect_signals()
 
-        # Disable delete and edit buttons until any pocket is selected
-        self.deleteButton.setEnabled(False)
-        self.editButton.setEnabled(False)
-
     def _setup_inputs(self):
         self.nameInput.setPlaceholderText("Pocket Name")
 
@@ -33,6 +29,10 @@ class PocketsWidget(Ui_PocketsWidget, BaseWidget):
         self.balanceInput.setValue(0.00)
 
         self.currencySelect.addItems(CURRENCIES)
+
+        # Set default state to disabled
+        self.deleteButton.setEnabled(False)
+        self.editButton.setEnabled(False)
 
     def _setup_table(self):
         self.pocketsTable.setColumnCount(3)
@@ -54,8 +54,9 @@ class PocketsWidget(Ui_PocketsWidget, BaseWidget):
 
     def _on_table_selection_changed(self):
         selected_items = self.pocketsTable.selectedItems()
-        self.deleteButton.setEnabled(bool(selected_items))
-        self.editButton.setEnabled(bool(selected_items))
+        has_selection = bool(selected_items)
+        self.deleteButton.setEnabled(has_selection)
+        self.editButton.setEnabled(has_selection)
 
     def _set_style_invalid(self, widget, is_invalid: bool):
         if is_invalid:

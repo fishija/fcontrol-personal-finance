@@ -16,7 +16,6 @@ class PocketRepository:
 
     def get_all(self) -> list[Pocket]:
         rows = self.db.fetch_all("SELECT id, name, balance, currency FROM pockets")
-        print(type(rows[0]))
         return [
             Pocket(
                 id=r["id"], name=r["name"], balance=r["balance"], currency=r["currency"]
