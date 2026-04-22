@@ -2,14 +2,15 @@ import atexit
 from PySide6.QtWidgets import QApplication
 from fcontrol.config import APP_NAME, APP_VERSION, DB_PATH
 from fcontrol.db_manager import DatabaseManager
-from fcontrol.models import PocketRepository
-from fcontrol.controllers import PocketController
+from fcontrol.models import PocketRepository, AllocationRepository
+from fcontrol.controllers import PocketController, AllocationController
 from fcontrol.ui import MainWindow, HomeWidget, AllocationWidget, PocketsWidget
 
 
 class Application:
     def __init__(self, argv):
         self.qt_app = QApplication(argv)
+        self.qt_app.setOrganizationName("jm")
         self.qt_app.setApplicationName(APP_NAME)
         self.qt_app.setApplicationVersion(APP_VERSION)
 
@@ -25,6 +26,9 @@ class Application:
 
     def _setup_repositories(self):
         self.pocket_repository = PocketRepository(self.db)
+        self.allocation_repository = AllocationRepository(
+            self.db, self.pocket_repository
+        )
 
     def _setup_views(self):
         self.home_widget = HomeWidget()
@@ -34,6 +38,14 @@ class Application:
     def _setup_controllers(self):
         self.pocket_controller = PocketController(
             self.pockets_widget, self.pocket_repository
+        )
+        self.allocation_controller = AllocationController(
+            self.allocation_widget, self.pocket_repository, self.allocation_repository
+        )
+
+        # Connections between controllers
+        self.pocket_controller.pocket_repo_changed.connect(
+            self.allocation_controller.refresh_pockets
         )
 
     def _setup_main_window(self):
