@@ -18,6 +18,15 @@ class DatabaseManager:
                 balance REAL NOT NULL,
                 currency TEXT NOT NULL
             );
+
+            CREATE TABLE IF NOT EXISTS allocation_rules (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                pocket_id INTEGER NOT NULL,
+                allocation_type TEXT NOT NULL,
+                value REAL NOT NULL,
+                position INTEGER NOT NULL,
+                FOREIGN KEY (pocket_id) REFERENCES pockets(id) ON DELETE CASCADE
+            );
         """
         )
 
