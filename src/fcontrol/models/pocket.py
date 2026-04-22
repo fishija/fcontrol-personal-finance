@@ -9,6 +9,14 @@ class Pocket:
     currency: str
     id: int | None = None
 
+    def __str__(self):
+        balance_str = (
+            f"{int(self.balance)}"
+            if self.balance.is_integer()
+            else f"{self.balance:.2f}"
+        )
+        return f"{self.name} ({balance_str} {self.currency})"
+
 
 class PocketRepository:
     def __init__(self, db: DatabaseManager):
