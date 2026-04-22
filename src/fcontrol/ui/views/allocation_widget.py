@@ -139,6 +139,9 @@ class AllocationWidget(Ui_AllocationWidget, BaseWidget):
             self.pocketSelect.addItem(f"{pocket.name} ({pocket.currency})", pocket.id)
 
     def populate_rules(self, rules: list[AllocationRule]):
+        # get selected row id before repopulating
+        selected_rule_id = self.get_selected_row_id(self.rulesTable)
+
         self.rulesTable.setRowCount(0)
         for rule in rules:
             row = self.rulesTable.rowCount()
@@ -150,3 +153,7 @@ class AllocationWidget(Ui_AllocationWidget, BaseWidget):
             self.rulesTable.setItem(row, 0, QTableWidgetItem(rule.pocket.name))
             self.rulesTable.setItem(row, 1, rule_item)
             self.rulesTable.setItem(row, 2, QTableWidgetItem(""))  # left to allocate
+
+            # restore selection
+            if selected_rule_id is not None and rule.id == selected_rule_id:
+                self.rulesTable.selectRow(row)
