@@ -41,20 +41,29 @@ class Ui_AllocationWidget(object):
         self.groupBox.setObjectName(u"groupBox")
         self.groupBox.setGeometry(QRect(20, 80, 511, 131))
         self.groupBox.setFlat(False)
-        self.horizontalLayout_5 = QHBoxLayout(self.groupBox)
-        self.horizontalLayout_5.setObjectName(u"horizontalLayout_5")
-        self.verticalLayout = QVBoxLayout()
+        self.addButton = QPushButton(self.groupBox)
+        self.addButton.setObjectName(u"addButton")
+        self.addButton.setGeometry(QRect(410, 50, 84, 32))
+        self.addButton.setAutoDefault(True)
+        self.infoLabel = QLabel(self.groupBox)
+        self.infoLabel.setObjectName(u"infoLabel")
+        self.infoLabel.setGeometry(QRect(20, 110, 471, 16))
+        self.widget = QWidget(self.groupBox)
+        self.widget.setObjectName(u"widget")
+        self.widget.setGeometry(QRect(20, 10, 253, 97))
+        self.verticalLayout = QVBoxLayout(self.widget)
         self.verticalLayout.setSpacing(4)
         self.verticalLayout.setObjectName(u"verticalLayout")
+        self.verticalLayout.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout_2 = QHBoxLayout()
         self.horizontalLayout_2.setSpacing(1)
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
-        self.label_3 = QLabel(self.groupBox)
+        self.label_3 = QLabel(self.widget)
         self.label_3.setObjectName(u"label_3")
 
         self.horizontalLayout_2.addWidget(self.label_3)
 
-        self.pocketSelect = QComboBox(self.groupBox)
+        self.pocketSelect = QComboBox(self.widget)
         self.pocketSelect.setObjectName(u"pocketSelect")
         sizePolicy = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         sizePolicy.setHorizontalStretch(0)
@@ -64,7 +73,7 @@ class Ui_AllocationWidget(object):
 
         self.horizontalLayout_2.addWidget(self.pocketSelect)
 
-        self.label_4 = QLabel(self.groupBox)
+        self.label_4 = QLabel(self.widget)
         self.label_4.setObjectName(u"label_4")
 
         self.horizontalLayout_2.addWidget(self.label_4)
@@ -79,19 +88,19 @@ class Ui_AllocationWidget(object):
         self.horizontalLayout_3 = QHBoxLayout()
         self.horizontalLayout_3.setSpacing(1)
         self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
-        self.label_5 = QLabel(self.groupBox)
+        self.label_5 = QLabel(self.widget)
         self.label_5.setObjectName(u"label_5")
 
         self.horizontalLayout_3.addWidget(self.label_5)
 
-        self.allocationTypeSelect = QComboBox(self.groupBox)
+        self.allocationTypeSelect = QComboBox(self.widget)
         self.allocationTypeSelect.setObjectName(u"allocationTypeSelect")
         sizePolicy.setHeightForWidth(self.allocationTypeSelect.sizePolicy().hasHeightForWidth())
         self.allocationTypeSelect.setSizePolicy(sizePolicy)
 
         self.horizontalLayout_3.addWidget(self.allocationTypeSelect)
 
-        self.label_6 = QLabel(self.groupBox)
+        self.label_6 = QLabel(self.widget)
         self.label_6.setObjectName(u"label_6")
 
         self.horizontalLayout_3.addWidget(self.label_6)
@@ -102,12 +111,12 @@ class Ui_AllocationWidget(object):
         self.horizontalLayout_4 = QHBoxLayout()
         self.horizontalLayout_4.setSpacing(1)
         self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
-        self.label_8 = QLabel(self.groupBox)
+        self.label_8 = QLabel(self.widget)
         self.label_8.setObjectName(u"label_8")
 
         self.horizontalLayout_4.addWidget(self.label_8)
 
-        self.ruleValueInput = QDoubleSpinBox(self.groupBox)
+        self.ruleValueInput = QDoubleSpinBox(self.widget)
         self.ruleValueInput.setObjectName(u"ruleValueInput")
         sizePolicy.setHeightForWidth(self.ruleValueInput.sizePolicy().hasHeightForWidth())
         self.ruleValueInput.setSizePolicy(sizePolicy)
@@ -116,26 +125,13 @@ class Ui_AllocationWidget(object):
 
         self.horizontalLayout_4.addWidget(self.ruleValueInput)
 
-        self.label_7 = QLabel(self.groupBox)
+        self.label_7 = QLabel(self.widget)
         self.label_7.setObjectName(u"label_7")
 
         self.horizontalLayout_4.addWidget(self.label_7)
 
 
         self.verticalLayout.addLayout(self.horizontalLayout_4)
-
-
-        self.horizontalLayout_5.addLayout(self.verticalLayout)
-
-        self.horizontalSpacer = QSpacerItem(75, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
-
-        self.horizontalLayout_5.addItem(self.horizontalSpacer)
-
-        self.addButton = QPushButton(self.groupBox)
-        self.addButton.setObjectName(u"addButton")
-        self.addButton.setAutoDefault(True)
-
-        self.horizontalLayout_5.addWidget(self.addButton)
 
         self.layoutWidget = QWidget(AllocationWidget)
         self.layoutWidget.setObjectName(u"layoutWidget")
@@ -183,13 +179,14 @@ class Ui_AllocationWidget(object):
         self.allocateButton.setText(QCoreApplication.translate("AllocationWidget", u"Allocate", None))
         self.deleteButton.setText(QCoreApplication.translate("AllocationWidget", u"Delete", None))
         self.groupBox.setTitle("")
+        self.addButton.setText(QCoreApplication.translate("AllocationWidget", u"Add Rule", None))
+        self.infoLabel.setText(QCoreApplication.translate("AllocationWidget", u"TextLabel", None))
         self.label_3.setText(QCoreApplication.translate("AllocationWidget", u"Allocate to", None))
         self.label_4.setText(QCoreApplication.translate("AllocationWidget", u"pocket.", None))
         self.label_5.setText(QCoreApplication.translate("AllocationWidget", u"Allocate by", None))
         self.label_6.setText(QCoreApplication.translate("AllocationWidget", u".", None))
         self.label_8.setText(QCoreApplication.translate("AllocationWidget", u"Value to allocate:", None))
         self.label_7.setText(QCoreApplication.translate("AllocationWidget", u".", None))
-        self.addButton.setText(QCoreApplication.translate("AllocationWidget", u"Add Rule", None))
         self.label_2.setText(QCoreApplication.translate("AllocationWidget", u"Income", None))
         self.upButton.setText(QCoreApplication.translate("AllocationWidget", u"Up", None))
         self.downButton.setText(QCoreApplication.translate("AllocationWidget", u"Down", None))

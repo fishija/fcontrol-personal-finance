@@ -1,8 +1,20 @@
-from PySide6.QtWidgets import QWidget, QTableWidget, QTableWidgetItem, QMessageBox
+from PySide6.QtWidgets import QWidget, QDialog, QTableWidget, QMessageBox, QLabel
 from PySide6.QtCore import Qt
 
 
-class BaseWidget(QWidget):
+class BaseObject:
+    def __init__(self):
+        pass
+
+    def _set_label(self, label: QLabel, message: str, is_error: bool = False):
+        label.setText(message)
+        if is_error:
+            label.setStyleSheet("color: red;")
+        else:
+            label.setStyleSheet("")
+
+
+class BaseWidget(QWidget, BaseObject):
     def __init__(self):
         super().__init__()
 
@@ -27,3 +39,8 @@ class BaseWidget(QWidget):
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
         )
         return reply == QMessageBox.StandardButton.Yes
+
+
+class BaseDialog(QDialog, BaseObject):
+    def __init__(self, parent=None):
+        super().__init__(parent)

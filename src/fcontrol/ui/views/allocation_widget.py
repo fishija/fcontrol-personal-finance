@@ -1,7 +1,7 @@
-from PySide6.QtWidgets import QTableWidget, QTableWidgetItem, QMessageBox
+from PySide6.QtWidgets import QTableWidget, QTableWidgetItem
 from PySide6.QtCore import Signal, Qt
 
-from fcontrol.ui.views.base_widget import BaseWidget
+from fcontrol.ui.views.base import BaseWidget
 from fcontrol.ui.qt_generated.allocation_widget import Ui_AllocationWidget
 from fcontrol.models import Pocket, AllocationRule, AllocationType
 from fcontrol.config import CURRENCIES
@@ -24,6 +24,8 @@ class AllocationWidget(Ui_AllocationWidget, BaseWidget):
         self._setup_table()
         self._connect_signals()
 
+        self.infoLabel.setText("")
+
     def _setup_inputs(self):
         self.incomeInput.setMinimum(0)
         self.incomeInput.setMaximum(1_000_000_000)
@@ -39,7 +41,6 @@ class AllocationWidget(Ui_AllocationWidget, BaseWidget):
         )
 
         # Set default state to disabled
-        self.allocateButton.setEnabled(False)
         self.deleteButton.setEnabled(False)
         self.editButton.setEnabled(False)
         self.upButton.setEnabled(False)
@@ -58,11 +59,6 @@ class AllocationWidget(Ui_AllocationWidget, BaseWidget):
         self.rulesTable.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
 
     def _connect_signals(self):
-        self.pocketSelect.currentIndexChanged.connect(self._on_new_rule_input_changed)
-        self.allocationTypeSelect.currentIndexChanged.connect(
-            self._on_new_rule_input_changed
-        )
-        self.ruleValueInput.valueChanged.connect(self._on_new_rule_input_changed)
         self.rulesTable.itemSelectionChanged.connect(self._on_table_selection_changed)
 
         self.addButton.clicked.connect(self._on_add_clicked)
@@ -80,27 +76,41 @@ class AllocationWidget(Ui_AllocationWidget, BaseWidget):
         self.upButton.setEnabled(has_selection)
         self.downButton.setEnabled(has_selection)
 
-    def _on_new_rule_input_changed(self):
-        pocket_select_index = self.pocketSelect.currentIndex()
-        allocation_type_index = self.allocationTypeSelect.currentIndex()
-        rule_value = self.ruleValueInput.value()
-
-        if pocket_select_index > 0 and allocation_type_index > 0 and rule_value > 0:
-            self.addButton.setEnabled(True)
-        else:
-            self.addButton.setEnabled(False)
-
     def _clear_new_rule_inputs(self):
         self.pocketSelect.setCurrentIndex(0)
         self.allocationTypeSelect.setCurrentIndex(0)
         self.ruleValueInput.setValue(0.00)
 
     def _on_add_clicked(self):
+        pocket_id = self.pocketSelect.currentData()
+        allocation_type = self.allocationTypeSelect.currentText()
+        value = self.ruleValueInput.value()
+
+        # Basic validation
+        if pocket_id is None:
+            self._set_label(
+                self.infoLabel,
+                "Please select a pocket for the allocation rule.",
+                is_error=True,
+            )
+            return
+        elif allocation_type == "Select":
+            self._set_label(
+                self.infoLabel, "Please select an allocation type.", is_error=True
+            )
+            return
+        elif value <= 0:
+            self._set_label(
+                self.infoLabel,
+                "Please enter a value greater than zero for the rule.",
+                is_error=True,
+            )
+            return
+        else:
+            self._set_label(self.infoLabel, "", is_error=False)
+
         self.add_request.emit(
-            self.pocketSelect.currentData(),
-            self.allocationTypeSelect.currentText(),
-            self.ruleValueInput.value(),
-            self.rulesTable.rowCount(),
+            pocket_id, allocation_type, value, self.rulesTable.rowCount()
         )
         self._clear_new_rule_inputs()
 

@@ -1,16 +1,18 @@
-from PySide6.QtWidgets import QDialog
-
+from fcontrol.ui.views.base import BaseDialog
 from fcontrol.ui.qt_generated.pocket_edit_dialog import Ui_PocketEditDialog
 from fcontrol.config import CURRENCIES
 
 
-class PocketEditDialog(Ui_PocketEditDialog, QDialog):
+class PocketEditDialog(Ui_PocketEditDialog, BaseDialog):
     def __init__(self, pocket, parent=None):
         super().__init__(parent)
         self.setupUi(self)
         self._set_inputs()
         self._populate(pocket)
         self._connect_signals()
+
+        # Clear any default text in the info label
+        self.infoLabel.setText("")
 
     def _set_inputs(self):
         self.balanceInput.setMinimum(0)
@@ -30,23 +32,16 @@ class PocketEditDialog(Ui_PocketEditDialog, QDialog):
         self.balanceInput.setValue(pocket.balance)
         self.currencySelect.setCurrentText(pocket.currency)
 
-    def _set_style_invalid(self, widget, is_invalid: bool):
-        if is_invalid:
-            widget.setStyleSheet("border: 1px solid red;")
-        else:
-            widget.setStyleSheet("")
-
     def _connect_signals(self):
         self.saveButton.clicked.connect(self._on_save_clicked)
         self.cancelButton.clicked.connect(self.reject)
 
     def _on_save_clicked(self):
-        # Validate inputs
         if not self.nameInput.text().strip():
-            self._set_style_invalid(self.nameInput, True)
+            self._set_label(self.infoLabel, "Name cannot be empty.", is_error=True)
             return
         else:
-            self._set_style_invalid(self.nameInput, False)
+            self._set_label(self.infoLabel, "")
 
         self.accept()
 

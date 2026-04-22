@@ -125,6 +125,9 @@ class Ui_AllocationRuleEditDialog(object):
 
         self.horizontalLayout_5.addItem(self.horizontalSpacer)
 
+        self.infoLabel = QLabel(AllocationRuleEditDialog)
+        self.infoLabel.setObjectName(u"infoLabel")
+        self.infoLabel.setGeometry(QRect(20, 220, 361, 16))
 
         self.retranslateUi(AllocationRuleEditDialog)
 
@@ -145,5 +148,6 @@ class Ui_AllocationRuleEditDialog(object):
         self.label_6.setText(QCoreApplication.translate("AllocationRuleEditDialog", u".", None))
         self.label_8.setText(QCoreApplication.translate("AllocationRuleEditDialog", u"Value to allocate:", None))
         self.label_7.setText(QCoreApplication.translate("AllocationRuleEditDialog", u".", None))
+        self.infoLabel.setText(QCoreApplication.translate("AllocationRuleEditDialog", u"TextLabel", None))
     # retranslateUi
 

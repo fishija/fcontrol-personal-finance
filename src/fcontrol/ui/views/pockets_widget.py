@@ -1,7 +1,7 @@
 from PySide6.QtWidgets import QTableWidget, QTableWidgetItem, QMessageBox
 from PySide6.QtCore import Qt, Signal
 
-from fcontrol.ui.views.base_widget import BaseWidget
+from fcontrol.ui.views.base import BaseWidget
 from fcontrol.ui.qt_generated.pockets_widget import Ui_PocketsWidget
 from fcontrol.models import Pocket
 from fcontrol.config import CURRENCIES
@@ -19,6 +19,9 @@ class PocketsWidget(Ui_PocketsWidget, BaseWidget):
         self._setup_inputs()
         self._setup_table()
         self._connect_signals()
+
+        # Clear any default text in the info label
+        self.infoLabel.setText("")
 
     def _setup_inputs(self):
         self.nameInput.setPlaceholderText("Pocket Name")
@@ -58,25 +61,27 @@ class PocketsWidget(Ui_PocketsWidget, BaseWidget):
         self.deleteButton.setEnabled(has_selection)
         self.editButton.setEnabled(has_selection)
 
-    def _set_style_invalid(self, widget, is_invalid: bool):
-        if is_invalid:
-            widget.setStyleSheet("border: 1px solid red;")
-        else:
-            widget.setStyleSheet("")
+    def _clear_new_pocket_inputs(self):
+        self.nameInput.clear()
+        self.balanceInput.setValue(0.00)
+        self.currencySelect.setCurrentIndex(0)
 
     def _on_add_clicked(self):
         name = self.nameInput.text().strip()
         balance = self.balanceInput.value()
         currency = self.currencySelect.currentText()
 
-        # perform input validation
+        # Basic validation
         if not name:
-            self._set_style_invalid(self.nameInput, True)
+            self._set_label(
+                self.infoLabel, "Please enter a name for the pocket.", is_error=True
+            )
             return
         else:
-            self._set_style_invalid(self.nameInput, False)
+            self._set_label(self.infoLabel, "", is_error=False)
 
         self.add_request.emit(name, balance, currency)
+        self._clear_new_pocket_inputs()
 
     def _on_delete_clicked(self):
         pocket_id = self.get_selected_row_id(self.pocketsTable)

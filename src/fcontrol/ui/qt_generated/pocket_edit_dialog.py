@@ -68,6 +68,9 @@ class Ui_PocketEditDialog(object):
         self.currentCurrency = QLabel(PocketEditDialog)
         self.currentCurrency.setObjectName(u"currentCurrency")
         self.currentCurrency.setGeometry(QRect(120, 140, 91, 16))
+        self.infoLabel = QLabel(PocketEditDialog)
+        self.infoLabel.setObjectName(u"infoLabel")
+        self.infoLabel.setGeometry(QRect(30, 190, 341, 16))
 
         self.retranslateUi(PocketEditDialog)
 
@@ -90,5 +93,6 @@ class Ui_PocketEditDialog(object):
         self.currentName.setText(QCoreApplication.translate("PocketEditDialog", u"curr_name", None))
         self.currentBalance.setText(QCoreApplication.translate("PocketEditDialog", u"curr_balance", None))
         self.currentCurrency.setText(QCoreApplication.translate("PocketEditDialog", u"curr_currency", None))
+        self.infoLabel.setText(QCoreApplication.translate("PocketEditDialog", u"TextLabel", None))
     # retranslateUi
 
