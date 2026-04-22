@@ -24,7 +24,7 @@ class AllocationWidget(Ui_AllocationWidget, BaseWidget):
         self._setup_table()
         self._connect_signals()
 
-        self.infoLabel.setText("")
+        self._set_initial_state()
 
     def _setup_inputs(self):
         self.incomeInput.setMinimum(0)
@@ -66,6 +66,14 @@ class AllocationWidget(Ui_AllocationWidget, BaseWidget):
         self.editButton.clicked.connect(self._on_edit_clicked)
         self.upButton.clicked.connect(self._on_move_up_clicked)
         self.downButton.clicked.connect(self._on_move_down_clicked)
+
+    def _set_initial_state(self):
+        # Clear any default text in the info label
+        self.infoLabel.setText("")
+        self.pocketSelect.setCurrentIndex(0)
+        self.allocationTypeSelect.setCurrentIndex(0)
+        self.ruleValueInput.setValue(0.00)
+        self.rulesTable.clearSelection()
 
     def _on_table_selection_changed(self):
         selected_items = self.rulesTable.selectedItems()
@@ -140,6 +148,10 @@ class AllocationWidget(Ui_AllocationWidget, BaseWidget):
         rule_id = self.get_selected_row_id(self.rulesTable)
         if rule_id is not None:
             self.move_down_request.emit(rule_id)
+
+    def refresh(self):
+        # Clear selection and reset inputs when refreshing
+        self._set_initial_state()
 
     def populate_pockets(self, pockets: list[Pocket]):
         self.pocketSelect.clear()

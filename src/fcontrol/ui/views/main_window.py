@@ -46,3 +46,6 @@ class MainWindow(Ui_MainWindow, QMainWindow):
 
     def _on_nav_button_clicked(self, id):
         self.stackedWidget.setCurrentIndex(id)
+        view = self.stackedWidget.currentWidget()
+        if hasattr(view, "refresh"):
+            view.refresh()

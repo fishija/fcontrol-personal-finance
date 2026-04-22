@@ -20,8 +20,7 @@ class PocketsWidget(Ui_PocketsWidget, BaseWidget):
         self._setup_table()
         self._connect_signals()
 
-        # Clear any default text in the info label
-        self.infoLabel.setText("")
+        self._set_initial_state()
 
     def _setup_inputs(self):
         self.nameInput.setPlaceholderText("Pocket Name")
@@ -54,6 +53,13 @@ class PocketsWidget(Ui_PocketsWidget, BaseWidget):
         self.addButton.clicked.connect(self._on_add_clicked)
         self.editButton.clicked.connect(self._on_edit_clicked)
         self.deleteButton.clicked.connect(self._on_delete_clicked)
+
+    def _set_initial_state(self):
+        self.infoLabel.setText("")
+        self.pocketsTable.clearSelection()
+        self.nameInput.clear()
+        self.balanceInput.setValue(0.00)
+        self.currencySelect.setCurrentIndex(0)
 
     def _on_table_selection_changed(self):
         selected_items = self.pocketsTable.selectedItems()
@@ -101,6 +107,10 @@ class PocketsWidget(Ui_PocketsWidget, BaseWidget):
 
     def _on_double_clicked(self):
         self._on_edit_clicked()
+
+    def refresh(self):
+        # Clear selection and reset inputs when refreshing
+        self._set_initial_state()
 
     def populate_table(self, pockets: list[Pocket]):
         self.pocketsTable.setRowCount(0)
