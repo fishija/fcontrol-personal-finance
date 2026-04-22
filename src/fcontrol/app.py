@@ -1,5 +1,6 @@
 import atexit
 from PySide6.QtWidgets import QApplication
+from currency_converter import CurrencyConverter
 from fcontrol.config import APP_NAME, APP_VERSION, DB_PATH
 from fcontrol.db_manager import DatabaseManager
 from fcontrol.models import PocketRepository, AllocationRepository
@@ -14,11 +15,15 @@ class Application:
         self.qt_app.setApplicationName(APP_NAME)
         self.qt_app.setApplicationVersion(APP_VERSION)
 
+        self._setup_currency_converter()
         self._setup_database()
         self._setup_repositories()
         self._setup_views()
         self._setup_controllers()
         self._setup_main_window()
+
+    def _setup_currency_converter(self):
+        self.currency_converter = CurrencyConverter()
 
     def _setup_database(self):
         self.db = DatabaseManager(DB_PATH)
@@ -40,12 +45,15 @@ class Application:
             self.pockets_widget, self.pocket_repository
         )
         self.allocation_controller = AllocationController(
-            self.allocation_widget, self.pocket_repository, self.allocation_repository
+            self.allocation_widget,
+            self.pocket_repository,
+            self.allocation_repository,
+            self.currency_converter,
         )
 
         # Connections between controllers
         self.pocket_controller.pocket_repo_changed.connect(
-            self.allocation_controller.refresh_pockets
+            self.allocation_controller.refresh
         )
 
     def _setup_main_window(self):
