@@ -80,6 +80,9 @@ class AllocationWidget(Ui_AllocationWidget, BaseWidget):
         self.ruleValueInput.setValue(0.00)
         self.rulesTable.clearSelection()
 
+        if self.incomeInput.value():
+            self._on_income_changed()
+
     def _on_income_changed(self):
         value = self.incomeInput.value()
         currency = self.currencySelect.currentText()
@@ -165,6 +168,18 @@ class AllocationWidget(Ui_AllocationWidget, BaseWidget):
         if rule_id is not None:
             self.move_down_request.emit(rule_id)
 
+    def _manage_allocation_message(
+        self, income_left_to_allocate: float, income_currency: str
+    ):
+        if income_left_to_allocate > 0:
+            self._set_label(
+                self.infoLabel,
+                f"{income_left_to_allocate:.2f} {income_currency} left to allocate",
+                is_warning=True,
+            )
+        else:
+            self._set_label(self.infoLabel, "All income allocated", is_success=True)
+
     def refresh(self):
         # Clear selection and reset inputs when refreshing
         self._set_initial_state()
@@ -211,6 +226,7 @@ class AllocationWidget(Ui_AllocationWidget, BaseWidget):
         self, allocated_amounts: list[tuple[AllocationRule, float, float]]
     ):
         income_currency = self.currencySelect.currentText()
+        income_left_to_allocate = self.incomeInput.value()
 
         for row in range(self.rulesTable.rowCount()):
             rule_item = self.rulesTable.item(row, 1)
@@ -223,6 +239,8 @@ class AllocationWidget(Ui_AllocationWidget, BaseWidget):
 
             if rule_item is None:
                 continue
+
+            income_left_to_allocate -= alloc_value_in_income_currency
 
             self.rulesTable.setItem(
                 row,
@@ -242,3 +260,5 @@ class AllocationWidget(Ui_AllocationWidget, BaseWidget):
                 3,
                 QTableWidgetItem(f"{new_balance_str} {rule.pocket.currency}"),
             )
+
+        self._manage_allocation_message(income_left_to_allocate, income_currency)
