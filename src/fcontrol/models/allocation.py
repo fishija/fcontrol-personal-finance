@@ -20,10 +20,9 @@ class AllocationRule:
     position: int = 0
     id: int | None = None
 
-    @property
-    def short_name(self) -> str:
+    def get_short_name(self, income_currency: str) -> str:
         if self.allocation_type == AllocationType.AMOUNT:
-            return f"{self.value:.2f} {self.pocket.currency} fixed"
+            return f"{self.value:.2f} {income_currency} fixed"
         elif self.allocation_type == AllocationType.PERCENTAGE:
             return f"{self.value:.1f}% of income"
         elif self.allocation_type == AllocationType.TARGET_BALANCE:
@@ -31,13 +30,63 @@ class AllocationRule:
         else:
             return "Unknown"
 
-    def calculate_allocation(self, income: float) -> float:
+    def calculate_allocation(
+        self,
+        income: float,
+        income_left: float,
+        income_currency: str,
+        current_pocket_balance: float,
+        currency_converter,
+    ) -> tuple[float, float]:
+        """Return allocated amount in pocket currency and in income currency"""
+
+        def convert_to_pocket_currency(amount: float) -> float:
+            if income_currency != self.pocket.currency:
+                return currency_converter.convert(
+                    amount, income_currency, self.pocket.currency
+                )
+            return amount
+
+        def convert_to_income_currency(amount: float) -> float:
+            if self.pocket.currency != income_currency:
+                return currency_converter.convert(
+                    amount, self.pocket.currency, income_currency
+                )
+            return amount
+
+        income_in_pocket_currency = convert_to_pocket_currency(income)
+        income_left_in_pocket_currency = convert_to_pocket_currency(income_left)
+        value_in_pocket_currency = convert_to_pocket_currency(self.value)
+
         if self.allocation_type == AllocationType.AMOUNT:
-            return self.value
+            allocated_in_pocket_currency = min(
+                income_left_in_pocket_currency, value_in_pocket_currency
+            )
+            allocated_in_income_currency = min(income_left, self.value)
+            return allocated_in_pocket_currency, allocated_in_income_currency
+
         elif self.allocation_type == AllocationType.PERCENTAGE:
-            return income * (self.value / 100)
+            allocated_in_pocket_currency = min(
+                income_in_pocket_currency * (self.value / 100),
+                income_left_in_pocket_currency,
+            )
+            allocated_in_income_currency = min(income * (self.value / 100), income_left)
+            return allocated_in_pocket_currency, allocated_in_income_currency
+
         elif self.allocation_type == AllocationType.TARGET_BALANCE:
-            return max(0, self.value - self.pocket.balance)
+            current_balance = current_pocket_balance
+            if current_balance >= self.value:
+                return 0.0, 0.0
+
+            needed_in_pocket_currency = self.value - current_balance
+            allocated_in_pocket_currency = min(
+                income_left_in_pocket_currency, needed_in_pocket_currency
+            )
+            allocated_in_income_currency = convert_to_income_currency(
+                allocated_in_pocket_currency
+            )
+
+            return allocated_in_pocket_currency, allocated_in_income_currency
         else:
             raise ValueError("Invalid allocation type")
 

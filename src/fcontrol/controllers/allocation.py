@@ -15,11 +15,13 @@ class AllocationController(QObject):
         view: AllocationWidget,
         pocket_repository: PocketRepository,
         allocation_repository: AllocationRepository,
+        currency_converter,
     ):
         super().__init__()
         self.view = view
         self.pocket_repository = pocket_repository
         self.allocation_repository = allocation_repository
+        self.currency_converter = currency_converter
 
         self._connect_signals()
         self.refresh()
@@ -30,6 +32,9 @@ class AllocationController(QObject):
         self.view.edit_request.connect(self._on_edit_allocation_rule)
         self.view.move_up_request.connect(self._on_move_up_allocation_rule)
         self.view.move_down_request.connect(self._on_move_down_allocation_rule)
+
+        self.view.refresh_rules_request.connect(self.refresh_rules)
+        self.view.calculate_request.connect(self._on_calculate_allocation)
 
     def _on_add_allocation_rule(
         self, pocket_id: int, allocation_type: str, value: float, position: int
@@ -107,6 +112,38 @@ class AllocationController(QObject):
                 self.allocation_repository.update(rule)
 
         self.refresh_rules()
+
+    def _on_calculate_allocation(self, income_value: float, income_currency: str):
+        list_of_dictionaries_to_return = []
+
+        pocket_balances = {
+            pocket.id: pocket.balance for pocket in self.pocket_repository.get_all()
+        }
+
+        rules = self.allocation_repository.get_all()
+        income_left = income_value
+        for rule in rules:
+            alloc_value_in_pocket_currency, alloc_value_in_income_currency = (
+                rule.calculate_allocation(
+                    income_value,
+                    income_left,
+                    income_currency,
+                    pocket_balances[rule.pocket.id],
+                    self.currency_converter,
+                )
+            )
+
+            pocket_balances[rule.pocket.id] += alloc_value_in_pocket_currency
+            dict_to_append = {
+                "rule": rule,
+                "alloc_value_in_pocket_currency": alloc_value_in_pocket_currency,
+                "alloc_value_in_income_currency": alloc_value_in_income_currency,
+                "new_balance_in_pocket_currency": pocket_balances[rule.pocket.id],
+            }
+            list_of_dictionaries_to_return.append(dict_to_append)
+            income_left -= alloc_value_in_income_currency
+
+        self.view.display_calculation_results(list_of_dictionaries_to_return)
 
     def _reorder_rules(self, rules: list[AllocationRule]):
         for index, rule in enumerate(rules):
