@@ -11,6 +11,14 @@ class AllocationType(enum.Enum):
     TARGET_BALANCE = r"target balance of pocket"
 
 
+@dataclass
+class AllocationResult:
+    rule: "AllocationRule"
+    allocated_in_pocket_currency: float
+    allocated_in_income_currency: float
+    new_balance_in_pocket_currency: float
+
+
 # TODO: add possibility to instead of value, give "all remaining from income"
 @dataclass
 class AllocationRule:

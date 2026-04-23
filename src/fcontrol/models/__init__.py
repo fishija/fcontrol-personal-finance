@@ -1,5 +1,10 @@
 from .pocket import Pocket, PocketRepository
-from .allocation import AllocationRule, AllocationType, AllocationRepository
+from .allocation import (
+    AllocationRule,
+    AllocationType,
+    AllocationRepository,
+    AllocationResult,
+)
 
 
 __all__ = [
@@ -8,4 +13,5 @@ __all__ = [
     "AllocationRule",
     "AllocationType",
     "AllocationRepository",
+    "AllocationResult",
 ]

@@ -3,7 +3,7 @@ from PySide6.QtCore import Signal, Qt
 
 from fcontrol.ui.views.base import BaseWidget
 from fcontrol.ui.qt_generated.allocation_widget import Ui_AllocationWidget
-from fcontrol.models import Pocket, AllocationRule, AllocationType
+from fcontrol.models import Pocket, AllocationRule, AllocationType, AllocationResult
 from fcontrol.config import CURRENCIES
 
 
@@ -71,6 +71,8 @@ class AllocationWidget(Ui_AllocationWidget, BaseWidget):
         self.editButton.clicked.connect(self._on_edit_clicked)
         self.upButton.clicked.connect(self._on_move_up_clicked)
         self.downButton.clicked.connect(self._on_move_down_clicked)
+
+        self.allocateButton.clicked.connect(self._on_allocate_clicked)
 
     def _set_initial_state(self):
         # Clear any default text in the info label
@@ -168,6 +170,9 @@ class AllocationWidget(Ui_AllocationWidget, BaseWidget):
         if rule_id is not None:
             self.move_down_request.emit(rule_id)
 
+    def _on_allocate_clicked(self):
+        pass  # TODO
+
     def _manage_allocation_message(
         self, income_left_to_allocate: float, income_currency: str
     ):
@@ -222,43 +227,31 @@ class AllocationWidget(Ui_AllocationWidget, BaseWidget):
             self.incomeInput.value(), self.currencySelect.currentText()
         )
 
-    def display_calculation_results(
-        self, allocated_amounts: list[tuple[AllocationRule, float, float]]
-    ):
+    def display_calculation_results(self, results: list[AllocationResult]):
         income_currency = self.currencySelect.currentText()
         income_left_to_allocate = self.incomeInput.value()
 
-        for row in range(self.rulesTable.rowCount()):
-            rule_item = self.rulesTable.item(row, 1)
-            (
-                rule,
-                alloc_value_in_pocket_currency,
-                alloc_value_in_income_currency,
-                new_balance_in_pocket_currency,
-            ) = allocated_amounts[row].values()
-
-            if rule_item is None:
-                continue
-
-            income_left_to_allocate -= alloc_value_in_income_currency
+        for row, result in enumerate(results):
+            income_left_to_allocate -= result.allocated_in_income_currency
 
             self.rulesTable.setItem(
                 row,
                 2,
                 QTableWidgetItem(
-                    f"{alloc_value_in_income_currency:.2f} {income_currency}"
+                    f"{result.allocated_in_income_currency:.2f} {income_currency}"
                 ),
             )
 
+            new_balance = result.new_balance_in_pocket_currency
             new_balance_str = (
-                f"{int(new_balance_in_pocket_currency)}"
-                if new_balance_in_pocket_currency.is_integer()
-                else f"{new_balance_in_pocket_currency:.2f}"
+                f"{int(new_balance)}"
+                if new_balance.is_integer()
+                else f"{new_balance:.2f}"
             )
             self.rulesTable.setItem(
                 row,
                 3,
-                QTableWidgetItem(f"{new_balance_str} {rule.pocket.currency}"),
+                QTableWidgetItem(f"{new_balance_str} {result.rule.pocket.currency}"),
             )
 
         self._manage_allocation_message(income_left_to_allocate, income_currency)
