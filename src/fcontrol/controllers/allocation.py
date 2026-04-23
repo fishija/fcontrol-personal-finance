@@ -1,13 +1,8 @@
 from PySide6.QtCore import QObject
 
+from fcontrol.ui.views.base import LabelState
 from fcontrol.ui import AllocationWidget, AllocationRuleEditDialog
-from fcontrol.models import (
-    PocketRepository,
-    AllocationRule,
-    AllocationType,
-    AllocationRepository,
-    AllocationResult,
-)
+from fcontrol.models import AllocationType, AllocationResult
 from fcontrol.services import AllocationService
 
 
@@ -15,14 +10,10 @@ class AllocationController(QObject):
     def __init__(
         self,
         view: AllocationWidget,
-        pocket_repository: PocketRepository,
-        allocation_repository: AllocationRepository,
         allocation_service: AllocationService,
     ):
         super().__init__()
         self.view = view
-        self.pocket_repository = pocket_repository
-        self.allocation_repository = allocation_repository
         self.allocation_service = allocation_service
 
         self._connect_signals()
@@ -40,137 +31,115 @@ class AllocationController(QObject):
     def _on_add_allocation_rule(
         self, pocket_id: int, allocation_type: str, value: float, position: int
     ):
-        pocket = self.pocket_repository.get_by_id(pocket_id)
-        if not pocket:
-            print(f"Pocket with ID {pocket_id} not found.")
+        try:
+            error = self.allocation_service.add_rule(
+                pocket_id, allocation_type, value, position
+            )
+            if error:
+                self.view.set_info_message(error, LabelState.ERROR)
+                return
+        except Exception as e:
+            self.view.set_info_message(
+                f"Unexpected error when adding allocation rule: {str(e)}",
+                LabelState.ERROR,
+            )
             return
 
-        new_rule = AllocationRule(
-            pocket=pocket,
-            allocation_type=AllocationType(allocation_type),
-            value=value,
-            position=position,
-        )
-        self.allocation_repository.insert(new_rule)
         self.refresh_rules()
         self.view.clear_new_rule_inputs()
 
     def _on_delete_allocation_rule(self, rule_id: int):
-        self.allocation_repository.delete(rule_id)
+        try:
+            self.allocation_service.delete_rule(rule_id)
+        except Exception as e:
+            self.view.set_info_message(
+                f"Unexpected error when deleting rule: {str(e)}", LabelState.ERROR
+            )
+            return
+
         self.refresh_rules()
 
     def _on_edit_allocation_rule(self, rule_id: int):
-        rule = self.allocation_repository.get_by_id(rule_id)
+        rule = self.allocation_service.get_rule_by_id(rule_id)
         if not rule:
-            print(f"Allocation rule with ID {rule_id} not found.")
             return
 
-        pockets = self.pocket_repository.get_all()
+        pockets = self.allocation_service.get_pockets()
         dialog = AllocationRuleEditDialog(rule, pockets, AllocationType)
-        if dialog.exec_():
-            new_values = dialog.get_values()
+        if not dialog.exec_():
+            return
 
-            pocket = self.pocket_repository.get_by_id(new_values["pocket_id"])
-            if not pocket:
-                print(f"Pocket with ID {new_values['pocket_id']} not found.")
+        new_values = dialog.get_values()
+        try:
+            error = self.allocation_service.update_rule(
+                rule_id,
+                new_values["pocket_id"],
+                new_values["allocation_type"],
+                new_values["value"],
+            )
+            if error:
+                self.view.set_info_message(error, LabelState.ERROR)
                 return
+        except Exception as e:
+            self.view.set_info_message(f"Unexpected error: {e}", LabelState.ERROR)
+            return
 
-            rule.pocket = pocket
-            rule.allocation_type = AllocationType(new_values["allocation_type"])
-            rule.value = new_values["value"]
-            self.allocation_repository.update(rule)
-            self.refresh_rules()
+        self.refresh_rules()
 
     def _on_move_up_allocation_rule(self, rule_id: int):
-        rule = self.allocation_repository.get_by_id(rule_id)
-        if not rule:
-            print(f"Allocation rule with ID {rule_id} not found.")
-            return
-
-        if rule.position > 0:
-            previous_rule = self.allocation_repository.get_by_position(
-                rule.position - 1
+        try:
+            error = self.allocation_service.move_rule_up(rule_id)
+            if error:
+                # Do nothing
+                return
+            self.refresh_rules()
+        except Exception as e:
+            self.view.set_info_message(
+                f"Unexpected error when moving rule: {str(e)}", LabelState.ERROR
             )
-            if previous_rule:
-                previous_rule.position += 1
-                rule.position -= 1
-                self.allocation_repository.update(previous_rule)
-                self.allocation_repository.update(rule)
-
-        self.refresh_rules()
 
     def _on_move_down_allocation_rule(self, rule_id: int):
-        rule = self.allocation_repository.get_by_id(rule_id)
-        if not rule:
-            print(f"Allocation rule with ID {rule_id} not found.")
-            return
-
-        if rule.position < self.allocation_repository.count() - 1:
-            next_rule = self.allocation_repository.get_by_position(rule.position + 1)
-            if next_rule:
-                next_rule.position -= 1
-                rule.position += 1
-                self.allocation_repository.update(next_rule)
-                self.allocation_repository.update(rule)
-
-        self.refresh_rules()
+        try:
+            error = self.allocation_service.move_rule_down(rule_id)
+            if error:
+                # Do nothing
+                return
+            self.refresh_rules()
+        except Exception as e:
+            self.view.set_info_message(
+                f"Unexpected error when moving rule: {str(e)}", LabelState.ERROR
+            )
 
     def _on_income_changed(self):
         self.refresh_rules()
 
-    def _on_allocate_clicked(self):
-        pass  # TODO
-
-    def _calculate_allocation(
-        self, income_value: float, income_currency: str
-    ) -> list[AllocationResult]:
-        pocket_balances = {
-            pocket.id: pocket.balance for pocket in self.pocket_repository.get_all()
-        }
-        rules = self.allocation_repository.get_all()
-        results = self.allocation_service.calculate(
-            rules, pocket_balances, income_value, income_currency
-        )
-        return results
-
     def _set_allocation_message(self, results: list[AllocationResult]):
         income_value, income_currency = self.view.get_income_data()
-        left_to_allocate = results[-1].income_left_after_allocation if results else None
-        message = ""
-        is_error = False
-        is_warning = False
-        is_success = False
-
-        if income_value == 0:
-            message = "Enter an income value to allocate."
-            is_warning = True
-        elif left_to_allocate is None:
-            message = "No allocation rules defined."
-            is_warning = True
-        elif left_to_allocate > 0:
-            message = f"{left_to_allocate:.2f} {income_currency} left to allocate."
-            is_warning = True
-        else:
-            message = "All income allocated successfully."
-            is_success = True
-
-        self.view.manage_allocation_message(
-            message, is_error=is_error, is_warning=is_warning, is_success=is_success
+        validation_msg = self.allocation_service.validate_allocation_results(
+            income_value, income_currency, results
         )
 
+        if validation_msg:
+            self.view.set_info_message(validation_msg, LabelState.WARNING)
+        else:
+            self.view.set_info_message("Allocation looks good!", LabelState.SUCCESS)
+
+    def _on_allocate_clicked(self):
+        self.allocation_service.perform_allocation()
+
     def refresh_pockets(self):
-        pockets = self.pocket_repository.get_all()
+        pockets = self.allocation_service.get_pockets()
         self.view.populate_pockets(pockets)
 
     def refresh_rules(self):
-        rules = self.allocation_repository.get_all()
+        rules = self.allocation_service.get_allocation_rules()
         self.view.populate_rules(rules)
 
         # Get current income data to recalculate allocation results after refreshing rules
         income_input_value, income_currency = self.view.get_income_data()
 
         # Recalculate allocation after refreshing rules
-        allocation_results = self._calculate_allocation(
+        allocation_results = self.allocation_service.calculate_allocations(
             income_input_value, income_currency
         )
 

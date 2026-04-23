@@ -43,17 +43,16 @@ class Application:
         self.pockets_widget = PocketsWidget()
 
     def _setup_services(self):
-        self.allocation_service = AllocationService(self.currency_converter)
+        self.allocation_service = AllocationService(
+            self.pocket_repository, self.allocation_repository, self.currency_converter
+        )
 
     def _setup_controllers(self):
         self.pocket_controller = PocketController(
             self.pockets_widget, self.pocket_repository
         )
         self.allocation_controller = AllocationController(
-            self.allocation_widget,
-            self.pocket_repository,
-            self.allocation_repository,
-            self.allocation_service,
+            self.allocation_widget, self.allocation_service
         )
 
         # Connections between controllers
