@@ -17,6 +17,7 @@ class AllocationResult:
     allocated_in_pocket_currency: float
     allocated_in_income_currency: float
     new_balance_in_pocket_currency: float
+    income_left_after_allocation: float | None = None
 
 
 # TODO: add possibility to instead of value, give "all remaining from income"
