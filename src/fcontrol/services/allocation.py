@@ -1,9 +1,10 @@
-from fcontrol.models.allocation import AllocationRule, AllocationResult
+from fcontrol.models.allocation import AllocationRule, AllocationResult, AllocationType
 
 
 class AllocationService:
     def __init__(self, currency_converter):
         self.currency_converter = currency_converter
+        self.calculated_results = []
 
     def calculate(
         self,
@@ -23,6 +24,8 @@ class AllocationService:
                 pocket_balances[rule.pocket.id],
                 self.currency_converter,
             )
+            income_left -= allocated_income
+
             pocket_balances[rule.pocket.id] += allocated_pocket
             results.append(
                 AllocationResult(
@@ -30,8 +33,9 @@ class AllocationService:
                     allocated_in_pocket_currency=allocated_pocket,
                     allocated_in_income_currency=allocated_income,
                     new_balance_in_pocket_currency=pocket_balances[rule.pocket.id],
+                    income_left_after_allocation=income_left,
                 )
             )
-            income_left -= allocated_income
 
+        self.calculated_results = results
         return results

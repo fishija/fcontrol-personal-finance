@@ -15,8 +15,8 @@ class AllocationWidget(Ui_AllocationWidget, BaseWidget):
     edit_request = Signal(int)  # rule id
     move_up_request = Signal(int)  # rule id
     move_down_request = Signal(int)  # rule id
-    refresh_rules_request = Signal()
-    calculate_request = Signal(float, str)  # total income amount, currency
+    allocate_request = Signal()
+    income_changed = Signal()
 
     def __init__(self):
         super().__init__()
@@ -75,40 +75,26 @@ class AllocationWidget(Ui_AllocationWidget, BaseWidget):
         self.allocateButton.clicked.connect(self._on_allocate_clicked)
 
     def _set_initial_state(self):
-        # Clear any default text in the info label
-        self.infoLabel.setText("")
+        # self.infoLabel.setText("")
         self.pocketSelect.setCurrentIndex(0)
         self.allocationTypeSelect.setCurrentIndex(0)
         self.ruleValueInput.setValue(0.00)
         self.rulesTable.clearSelection()
 
-        if self.incomeInput.value():
-            self._on_income_changed()
-
     def _on_income_changed(self):
-        value = self.incomeInput.value()
-        currency = self.currencySelect.currentText()
-        self.calculate_request.emit(value, currency)
+        self.income_changed.emit()
 
     def _on_currency_changed(self):
-        value = self.incomeInput.value()
-        currency = self.currencySelect.currentText()
-        self.refresh_rules_request.emit()  # to refresh short names in the rules table
-        self.calculate_request.emit(value, currency)
+        self.income_changed.emit()
 
     def _on_table_selection_changed(self):
         selected_items = self.rulesTable.selectedItems()
-        has_selection = bool(selected_items)
 
+        has_selection = bool(selected_items)
         self.deleteButton.setEnabled(has_selection)
         self.editButton.setEnabled(has_selection)
         self.upButton.setEnabled(has_selection)
         self.downButton.setEnabled(has_selection)
-
-    def _clear_new_rule_inputs(self):
-        self.pocketSelect.setCurrentIndex(0)
-        self.allocationTypeSelect.setCurrentIndex(0)
-        self.ruleValueInput.setValue(0.00)
 
     def _on_add_clicked(self):
         pocket_id = self.pocketSelect.currentData()
@@ -141,7 +127,6 @@ class AllocationWidget(Ui_AllocationWidget, BaseWidget):
         self.add_request.emit(
             pocket_id, allocation_type, value, self.rulesTable.rowCount()
         )
-        self._clear_new_rule_inputs()
 
     def _on_delete_clicked(self):
         rule_id = self.get_selected_row_id(self.rulesTable)
@@ -171,19 +156,26 @@ class AllocationWidget(Ui_AllocationWidget, BaseWidget):
             self.move_down_request.emit(rule_id)
 
     def _on_allocate_clicked(self):
-        pass  # TODO
+        self.allocate_request.emit()
 
-    def _manage_allocation_message(
-        self, income_left_to_allocate: float, income_currency: str
+    def get_income_data(self) -> tuple[float, str]:
+        return self.incomeInput.value(), self.currencySelect.currentText()
+
+    def manage_allocation_message(
+        self, message: str, is_error=False, is_warning=False, is_success=False
     ):
-        if income_left_to_allocate > 0:
-            self._set_label(
-                self.infoLabel,
-                f"{income_left_to_allocate:.2f} {income_currency} left to allocate",
-                is_warning=True,
-            )
-        else:
-            self._set_label(self.infoLabel, "All income allocated", is_success=True)
+        self._set_label(
+            self.infoLabel,
+            message,
+            is_error=is_error,
+            is_warning=is_warning,
+            is_success=is_success,
+        )
+
+    def clear_new_rule_inputs(self):
+        self.pocketSelect.setCurrentIndex(0)
+        self.allocationTypeSelect.setCurrentIndex(0)
+        self.ruleValueInput.setValue(0.00)
 
     def refresh(self):
         # Clear selection and reset inputs when refreshing
@@ -223,17 +215,10 @@ class AllocationWidget(Ui_AllocationWidget, BaseWidget):
             if selected_rule_id is not None and rule.id == selected_rule_id:
                 self.rulesTable.selectRow(row)
 
-        self.calculate_request.emit(
-            self.incomeInput.value(), self.currencySelect.currentText()
-        )
-
     def display_calculation_results(self, results: list[AllocationResult]):
         income_currency = self.currencySelect.currentText()
-        income_left_to_allocate = self.incomeInput.value()
 
         for row, result in enumerate(results):
-            income_left_to_allocate -= result.allocated_in_income_currency
-
             self.rulesTable.setItem(
                 row,
                 2,
@@ -253,5 +238,3 @@ class AllocationWidget(Ui_AllocationWidget, BaseWidget):
                 3,
                 QTableWidgetItem(f"{new_balance_str} {result.rule.pocket.currency}"),
             )
-
-        self._manage_allocation_message(income_left_to_allocate, income_currency)
