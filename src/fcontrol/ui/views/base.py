@@ -1,5 +1,14 @@
+import enum
+
 from PySide6.QtWidgets import QWidget, QDialog, QTableWidget, QMessageBox, QLabel
 from PySide6.QtCore import Qt
+
+
+class LabelState(enum.Enum):
+    DEFAULT = "default"
+    SUCCESS = "success"
+    WARNING = "warning"
+    ERROR = "error"
 
 
 class BaseObject:
@@ -7,22 +16,16 @@ class BaseObject:
         pass
 
     def _set_label(
-        self,
-        label: QLabel,
-        message: str,
-        is_success: bool = False,
-        is_warning: bool = False,
-        is_error: bool = False,
+        self, label: QLabel, message: str, state: LabelState = LabelState.DEFAULT
     ):
+        colors = {
+            LabelState.SUCCESS: "color: green;",
+            LabelState.WARNING: "color: orange;",
+            LabelState.ERROR: "color: red;",
+            LabelState.DEFAULT: "",
+        }
         label.setText(message)
-        if is_success:
-            label.setStyleSheet("color: green;")
-        elif is_warning:
-            label.setStyleSheet("color: orange;")
-        elif is_error:
-            label.setStyleSheet("color: red;")
-        else:
-            label.setStyleSheet("")
+        label.setStyleSheet(colors[state])
 
 
 class BaseWidget(QWidget, BaseObject):
