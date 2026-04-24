@@ -5,6 +5,7 @@ from fcontrol.models import (
     PocketRepository,
     AllocationRepository,
 )
+from currency_converter import CurrencyConverter
 
 
 class AllocationService:
@@ -12,7 +13,7 @@ class AllocationService:
         self,
         pocket_repository: PocketRepository,
         allocation_repository: AllocationRepository,
-        currency_converter,
+        currency_converter: CurrencyConverter,
     ):
         self.pocket_repository = pocket_repository
         self.allocation_repository = allocation_repository

@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 import enum
 
-from fcontrol.models.pocket import Pocket, PocketRepository
+from fcontrol.models import Pocket, PocketRepository
 from fcontrol.db_manager import DatabaseManager
 
 
