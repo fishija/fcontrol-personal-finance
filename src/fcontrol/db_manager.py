@@ -6,6 +6,7 @@ class DatabaseManager:
         self.connection = sqlite3.connect(db_path)
         self.connection.row_factory = sqlite3.Row
         self._init_schema()
+        self._add_initial_data()
 
     def _init_schema(self):
         self.connection.executescript(
@@ -27,8 +28,46 @@ class DatabaseManager:
                 position INTEGER NOT NULL,
                 FOREIGN KEY (pocket_id) REFERENCES pockets(id) ON DELETE CASCADE
             );
+
+            CREATE TABLE IF NOT EXISTS categories (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                transaction_type TEXT NOT NULL
+            );
+
+            CREATE TABLE IF NOT EXISTS transactions (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                amount REAL NOT NULL,
+                pocket_id INTEGER NOT NULL,
+                category_id INTEGER NOT NULL,
+                date TEXT NOT NULL,
+                description TEXT,
+                FOREIGN KEY (pocket_id) REFERENCES pockets(id) ON DELETE CASCADE,
+                FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE
+            );
         """
         )
+
+    def _add_initial_data(self):
+        DEFAULT_CATEGORIES = [
+            ("Food & Groceries", "expense"),
+            ("Transport", "expense"),
+            ("Housing & Utilities", "expense"),
+            ("Entertainment", "expense"),
+            ("Healthcare", "expense"),
+            ("Clothing", "expense"),
+            ("Salary", "income"),
+            ("Freelance", "income"),
+            ("Other Income", "income"),
+            ("Other Expense", "expense"),
+        ]
+
+        # after your CREATE TABLE statement
+        self.connection.executemany(
+            "INSERT OR IGNORE INTO categories (name, transaction_type) VALUES (?, ?)",
+            DEFAULT_CATEGORIES,
+        )
+        self.connection.commit()
 
     def execute(self, query: str, params: tuple = ()) -> int:
         c = self.connection.execute(query, params)
