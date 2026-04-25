@@ -2,6 +2,7 @@ from .main_window import MainWindow
 from .home_widget import HomeWidget
 from .allocation_widget import AllocationWidget
 from .pockets_widget import PocketsWidget
+from .transactions_widget import TransactionsWidget
 from .pocket_edit_dialog import PocketEditDialog
 from .allocation_rule_edit_dialog import AllocationRuleEditDialog
 
@@ -11,6 +12,7 @@ __all__ = [
     "HomeWidget",
     "AllocationWidget",
     "PocketsWidget",
+    "TransactionsWidget",
     "PocketEditDialog",
     "AllocationRuleEditDialog",
 ]

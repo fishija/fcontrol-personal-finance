@@ -3,6 +3,7 @@ from .views import (
     HomeWidget,
     AllocationWidget,
     PocketsWidget,
+    TransactionsWidget,
     PocketEditDialog,
     AllocationRuleEditDialog,
 )
@@ -13,6 +14,7 @@ __all__ = [
     "HomeWidget",
     "AllocationWidget",
     "PocketsWidget",
+    "TransactionsWidget",
     "PocketEditDialog",
     "AllocationRuleEditDialog",
 ]
