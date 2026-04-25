@@ -5,6 +5,10 @@ from .allocation import (
     AllocationRepository,
     AllocationResult,
 )
+from .transaction import (
+    Category,
+    Transaction,
+)
 
 
 __all__ = [
@@ -14,4 +18,6 @@ __all__ = [
     "AllocationType",
     "AllocationRepository",
     "AllocationResult",
+    "Category",
+    "Transaction",
 ]
