@@ -4,12 +4,16 @@ from fcontrol.ui.qt_generated.main_window import Ui_MainWindow
 
 
 class MainWindow(Ui_MainWindow, QMainWindow):
-    def __init__(self, home_widget, allocation_widget, pockets_widget):
+    def __init__(
+        self, home_widget, allocation_widget, pockets_widget, transactions_widget
+    ):
         super().__init__()
         self.setupUi(self)
 
         # Setup
-        self._setup_stacked_widget(home_widget, allocation_widget, pockets_widget)
+        self._setup_stacked_widget(
+            home_widget, allocation_widget, pockets_widget, transactions_widget
+        )
         self._setup_navigation_buttons()
 
     def _setup_stacked_widget(
@@ -17,11 +21,13 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         home_widget,
         allocation_widget,
         pockets_widget,
+        transactions_widget,
     ):
         # Initialize and add widgets to the stacked widget
         self.stackedWidget.addWidget(home_widget)
         self.stackedWidget.addWidget(allocation_widget)
         self.stackedWidget.addWidget(pockets_widget)
+        self.stackedWidget.addWidget(transactions_widget)
 
     def _setup_navigation_buttons(self):
         # Group buttons for navigation
@@ -30,6 +36,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.nav_button_group.addButton(self.homeButton, 0)
         self.nav_button_group.addButton(self.allocationButton, 1)
         self.nav_button_group.addButton(self.pocketsButton, 2)
+        self.nav_button_group.addButton(self.transactionsButton, 3)
 
         # Set buttons to be checkable
         for button in self.nav_button_group.buttons():

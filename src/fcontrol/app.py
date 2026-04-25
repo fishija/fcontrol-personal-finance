@@ -6,7 +6,13 @@ from fcontrol.db_manager import DatabaseManager
 from fcontrol.models import PocketRepository, AllocationRepository
 from fcontrol.services import PocketService, AllocationService
 from fcontrol.controllers import PocketController, AllocationController
-from fcontrol.ui import MainWindow, HomeWidget, AllocationWidget, PocketsWidget
+from fcontrol.ui import (
+    MainWindow,
+    HomeWidget,
+    AllocationWidget,
+    PocketsWidget,
+    TransactionsWidget,
+)
 
 
 class Application:
@@ -41,6 +47,7 @@ class Application:
         self.home_widget = HomeWidget()
         self.allocation_widget = AllocationWidget()
         self.pockets_widget = PocketsWidget()
+        self.transactions_widget = TransactionsWidget()
 
     def _setup_services(self):
         self.pocket_service = PocketService(self.pocket_repository)
@@ -66,6 +73,7 @@ class Application:
             home_widget=self.home_widget,
             allocation_widget=self.allocation_widget,
             pockets_widget=self.pockets_widget,
+            transactions_widget=self.transactions_widget,
         )
         self.main_window.setWindowTitle(f"{APP_NAME} {APP_VERSION}")
 
