@@ -4,7 +4,7 @@ from currency_converter import CurrencyConverter
 from fcontrol.config import APP_NAME, APP_VERSION, DB_PATH
 from fcontrol.db_manager import DatabaseManager
 from fcontrol.models import PocketRepository, AllocationRepository
-from fcontrol.services import AllocationService
+from fcontrol.services import PocketService, AllocationService
 from fcontrol.controllers import PocketController, AllocationController
 from fcontrol.ui import MainWindow, HomeWidget, AllocationWidget, PocketsWidget
 
@@ -43,13 +43,14 @@ class Application:
         self.pockets_widget = PocketsWidget()
 
     def _setup_services(self):
+        self.pocket_service = PocketService(self.pocket_repository)
         self.allocation_service = AllocationService(
             self.pocket_repository, self.allocation_repository, self.currency_converter
         )
 
     def _setup_controllers(self):
         self.pocket_controller = PocketController(
-            self.pockets_widget, self.pocket_repository
+            self.pockets_widget, self.pocket_service
         )
         self.allocation_controller = AllocationController(
             self.allocation_widget, self.allocation_service

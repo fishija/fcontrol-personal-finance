@@ -1,7 +1,7 @@
-from PySide6.QtWidgets import QTableWidget, QTableWidgetItem, QMessageBox
+from PySide6.QtWidgets import QTableWidget, QTableWidgetItem
 from PySide6.QtCore import Qt, Signal
 
-from fcontrol.ui.views.base import BaseWidget
+from fcontrol.ui.views.base import BaseWidget, LabelState
 from fcontrol.ui.qt_generated.pockets_widget import Ui_PocketsWidget
 from fcontrol.models import Pocket
 from fcontrol.config import CURRENCIES
@@ -67,11 +67,6 @@ class PocketsWidget(Ui_PocketsWidget, BaseWidget):
         self.deleteButton.setEnabled(has_selection)
         self.editButton.setEnabled(has_selection)
 
-    def _clear_new_pocket_inputs(self):
-        self.nameInput.clear()
-        self.balanceInput.setValue(0.00)
-        self.currencySelect.setCurrentIndex(0)
-
     def _on_add_clicked(self):
         name = self.nameInput.text().strip()
         balance = self.balanceInput.value()
@@ -79,15 +74,14 @@ class PocketsWidget(Ui_PocketsWidget, BaseWidget):
 
         # Basic validation
         if not name:
-            self._set_label(
-                self.infoLabel, "Please enter a name for the pocket.", is_error=True
+            self.set_info_message(
+                "Please enter a name for the pocket.", state=LabelState.ERROR
             )
             return
         else:
-            self._set_label(self.infoLabel, "", is_error=False)
+            self.set_info_message("", state=LabelState.DEFAULT)
 
         self.add_request.emit(name, balance, currency)
-        self._clear_new_pocket_inputs()
 
     def _on_delete_clicked(self):
         pocket_id = self.get_selected_row_id(self.pocketsTable)
@@ -107,6 +101,14 @@ class PocketsWidget(Ui_PocketsWidget, BaseWidget):
 
     def _on_double_clicked(self):
         self._on_edit_clicked()
+
+    def clear_new_pocket_inputs(self):
+        self.nameInput.clear()
+        self.balanceInput.setValue(0.00)
+        self.currencySelect.setCurrentIndex(0)
+
+    def set_info_message(self, message: str, state: LabelState = LabelState.DEFAULT):
+        self._set_label(self.infoLabel, message, state=state)
 
     def refresh(self):
         # Clear selection and reset inputs when refreshing
