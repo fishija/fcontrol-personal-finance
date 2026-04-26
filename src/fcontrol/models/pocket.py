@@ -5,8 +5,8 @@ from fcontrol.db_manager import DatabaseManager
 @dataclass
 class Pocket:
     name: str
-    balance: float
     currency: str
+    balance: float = 0.0
     id: int | None = None
     # TODO: (idea) add "type" field to distinguish between cash, card, investment accounts, etc.
 
