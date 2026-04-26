@@ -47,8 +47,18 @@ class TransactionCategoryRepository:
     def __init__(self, db: DatabaseManager):
         self.db = db
 
-    def get_all(self) -> list[TransactionCategory]:
-        rows = self.db.fetch_all("SELECT id, name, transaction_type FROM categories")
+    def get_all(
+        self, transaction_type: TransactionType | None = None
+    ) -> list[TransactionCategory]:
+        if transaction_type:
+            rows = self.db.fetch_all(
+                "SELECT id, name, transaction_type FROM categories WHERE transaction_type = ?",
+                (transaction_type.value,),
+            )
+        else:
+            rows = self.db.fetch_all(
+                "SELECT id, name, transaction_type FROM categories"
+            )
         return [
             TransactionCategory(
                 id=r["id"],
