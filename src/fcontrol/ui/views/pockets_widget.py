@@ -79,7 +79,7 @@ class PocketsWidget(Ui_PocketsWidget, BaseWidget):
             )
             return
         else:
-            self.set_info_message("", state=LabelState.DEFAULT)
+            self.set_info_message("")
 
         self.add_request.emit(name, balance, currency)
 

@@ -1,4 +1,4 @@
-from fcontrol.ui.views.base import BaseDialog
+from fcontrol.ui.views.base import BaseDialog, LabelState
 from fcontrol.ui.qt_generated.pocket_edit_dialog import Ui_PocketEditDialog
 from fcontrol.config import CURRENCIES
 
@@ -38,7 +38,7 @@ class PocketEditDialog(Ui_PocketEditDialog, BaseDialog):
 
     def _on_save_clicked(self):
         if not self.nameInput.text().strip():
-            self._set_label(self.infoLabel, "Name cannot be empty.", is_error=True)
+            self._set_label(self.infoLabel, "Name cannot be empty.", LabelState.ERROR)
             return
         else:
             self._set_label(self.infoLabel, "")

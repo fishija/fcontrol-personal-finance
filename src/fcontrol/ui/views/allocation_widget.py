@@ -112,23 +112,23 @@ class AllocationWidget(Ui_AllocationWidget, BaseWidget):
             self._set_label(
                 self.infoLabel,
                 "Please select a pocket for the allocation rule.",
-                is_error=True,
+                LabelState.ERROR,
             )
             return
         elif allocation_type == "Select":
             self._set_label(
-                self.infoLabel, "Please select an allocation type.", is_error=True
+                self.infoLabel, "Please select an allocation type.", LabelState.ERROR
             )
             return
         elif value <= 0:
             self._set_label(
                 self.infoLabel,
                 "Please enter a value greater than zero for the rule.",
-                is_error=True,
+                LabelState.ERROR,
             )
             return
         else:
-            self._set_label(self.infoLabel, "", is_error=False)
+            self._set_label(self.infoLabel, "")
 
         self.add_request.emit(
             pocket_id, allocation_type, value, self.rulesTable.rowCount()

@@ -1,4 +1,4 @@
-from fcontrol.ui.views.base import BaseDialog
+from fcontrol.ui.views.base import BaseDialog, LabelState
 from fcontrol.ui.qt_generated.allocation_rule_edit_dialog import (
     Ui_AllocationRuleEditDialog,
 )
@@ -48,7 +48,7 @@ class AllocationRuleEditDialog(Ui_AllocationRuleEditDialog, BaseDialog):
     def _on_save_clicked(self):
         if self.ruleValueInput.value() <= 0:
             self._set_label(
-                self.infoLabel, "Value must be greater than 0.", is_error=True
+                self.infoLabel, "Value must be greater than 0.", LabelState.ERROR
             )
             return
         else:
