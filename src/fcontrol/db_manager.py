@@ -31,40 +31,35 @@ class DatabaseManager:
 
             CREATE TABLE IF NOT EXISTS categories (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL,
-                transaction_type TEXT NOT NULL
+                name TEXT NOT NULL
             );
 
             CREATE TABLE IF NOT EXISTS transactions (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 amount REAL NOT NULL,
                 pocket_id INTEGER NOT NULL,
-                category_id INTEGER NOT NULL,
+                transaction_type TEXT NOT NULL,
                 date TEXT NOT NULL,
+                category_id INTEGER,
+                source TEXT,
                 description TEXT,
                 FOREIGN KEY (pocket_id) REFERENCES pockets(id) ON DELETE CASCADE,
-                FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE
+                FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL
             );
         """
         )
 
     def _add_initial_data(self):
         DEFAULT_CATEGORIES = [
-            (1, "Food & Groceries", "expense"),
-            (2, "Transport", "expense"),
-            (3, "Housing & Utilities", "expense"),
-            (4, "Entertainment", "expense"),
-            (5, "Healthcare", "expense"),
-            (6, "Clothing", "expense"),
-            (7, "Salary", "income"),
-            (8, "Freelance", "income"),
-            (9, "Other Income", "income"),
-            (10, "Other Expense", "expense"),
+            (1, "Salary"),
+            (2, "Groceries"),
+            (3, "Entertainment"),
+            (4, "Utilities"),
+            (5, "Transport"),
         ]
 
-        # after your CREATE TABLE statement
         self.connection.executemany(
-            "INSERT OR IGNORE INTO categories (id, name, transaction_type) VALUES (?, ?, ?)",
+            "INSERT OR IGNORE INTO categories (id, name) VALUES (?, ?)",
             DEFAULT_CATEGORIES,
         )
         self.connection.commit()

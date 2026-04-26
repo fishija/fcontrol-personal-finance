@@ -9,6 +9,7 @@ from .transaction import (
     TransactionCategory,
     Transaction,
     TransactionType,
+    TransactionSource,
     TransactionCategoryRepository,
     TransactionRepository,
 )
@@ -24,6 +25,7 @@ __all__ = [
     "TransactionCategory",
     "Transaction",
     "TransactionType",
+    "TransactionSource",
     "TransactionCategoryRepository",
     "TransactionRepository",
 ]
