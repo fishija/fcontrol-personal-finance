@@ -8,6 +8,7 @@ class Pocket:
     balance: float
     currency: str
     id: int | None = None
+    # TODO: (idea) add "type" field to distinguish between cash, card, investment accounts, etc.
 
     def __str__(self):
         balance_str = (
@@ -16,6 +17,9 @@ class Pocket:
             else f"{self.balance:.2f}"
         )
         return f"{self.name} ({balance_str} {self.currency})"
+
+    def __hash__(self):
+        return hash(self.id)
 
 
 class PocketRepository:
