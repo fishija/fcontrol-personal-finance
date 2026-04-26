@@ -2,6 +2,7 @@ from fcontrol.models import (
     AllocationRule,
     AllocationResult,
     AllocationType,
+    Transaction,
     TransactionType,
     PocketRepository,
     AllocationRepository,
@@ -246,5 +247,41 @@ class AllocationService:
         self.calculated_results = results
         return results
 
-    def perform_allocation(self):
-        pass
+    def prep_allocation_summary_message(self) -> str:
+        message_lines = ["Allocation Summary:"]
+        for result in self.calculated_results:
+            line = f"- {result.rule.pocket.name}: {result.allocated_in_pocket_currency:.2f} {result.rule.pocket.currency}"
+            message_lines.append(line)
+        return "\n".join(message_lines)
+
+    def perform_allocation(self, transaction_category_id: int) -> str | None:
+        # Assume that calculations have been done and results are in self.calculated_results
+        pockets_allocation = {x: 0 for x in self.pocket_repository.get_all()}
+        for result in self.calculated_results:
+            pockets_allocation[
+                result.rule.pocket
+            ] += result.allocated_in_pocket_currency
+
+        # Update pocket balances
+        for pocket, allocated_amount in pockets_allocation.items():
+            new_balance = pocket.balance + allocated_amount
+            pocket.balance = new_balance
+            self.pocket_repository.update(pocket)
+
+        # Get income category
+        income_category = self.transaction_category_repository.get_by_id(
+            transaction_category_id
+        )
+
+        # Create transactions for allocations
+        for result in self.calculated_results:
+            if result.allocated_in_income_currency > 0:
+                self.transaction_repository.insert(
+                    Transaction(
+                        amount=result.allocated_in_income_currency,
+                        pocket=result.rule.pocket,
+                        category=income_category,
+                        description=f"Allocation to {result.rule.pocket.name}",
+                    )
+                )
+        return None
