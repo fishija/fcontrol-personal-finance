@@ -3,7 +3,13 @@ from PySide6.QtCore import Signal, Qt
 
 from fcontrol.ui.views.base import BaseWidget, LabelState
 from fcontrol.ui.qt_generated.allocation_widget import Ui_AllocationWidget
-from fcontrol.models import Pocket, AllocationRule, AllocationType, AllocationResult
+from fcontrol.models import (
+    Pocket,
+    AllocationRule,
+    AllocationType,
+    AllocationResult,
+    TransactionCategory,
+)
 from fcontrol.config import CURRENCIES
 
 
@@ -161,6 +167,10 @@ class AllocationWidget(Ui_AllocationWidget, BaseWidget):
     def get_income_data(self) -> tuple[float, str]:
         return self.incomeInput.value(), self.currencySelect.currentText()
 
+    def get_selected_category_id(self) -> int | None:
+        category_id = self.incomeCategorySelect.currentData()
+        return category_id
+
     def set_info_message(self, message: str, state: LabelState = LabelState.DEFAULT):
         self._set_label(self.infoLabel, message, state=state)
 
@@ -179,6 +189,12 @@ class AllocationWidget(Ui_AllocationWidget, BaseWidget):
         self.pocketSelect.addItem("Select", None)
         for pocket in pockets:
             self.pocketSelect.addItem(f"{pocket.name} ({pocket.currency})", pocket.id)
+
+    def populate_income_categories(self, categories: list[TransactionCategory]):
+        self.incomeCategorySelect.clear()
+        self.incomeCategorySelect.addItem("Select", None)
+        for category in categories:
+            self.incomeCategorySelect.addItem(category.name, category.id)
 
     def populate_rules(self, rules: list[AllocationRule]):
         # get selected row id before repopulating

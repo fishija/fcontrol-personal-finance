@@ -8,6 +8,7 @@ from .allocation import (
 from .transaction import (
     TransactionCategory,
     Transaction,
+    TransactionType,
     TransactionCategoryRepository,
     TransactionRepository,
 )
@@ -22,6 +23,7 @@ __all__ = [
     "AllocationResult",
     "TransactionCategory",
     "Transaction",
+    "TransactionType",
     "TransactionCategoryRepository",
     "TransactionRepository",
 ]
