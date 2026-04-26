@@ -9,19 +9,13 @@ from fcontrol.db_manager import DatabaseManager
 class TransactionType(Enum):
     INCOME = "income"
     EXPENSE = "expense"
-    # TRANSFER = "transfer"  # (between pockets) planned - requires cross-currency handling
-
-    # ideas for future transactionTypes, not implemented yet
-    # GOAL_CONTRIBUTION = "goal_contribution"
-    # GOAL_WITHDRAWAL = "goal_withdrawal"  # when money is taken out of a goal
-    # INVESTMENT_PROFIT = "investment_profit"
-    # INVESTMENT_LOSS = "investment_loss"
 
 
 @dataclass
 class TransactionCategory:
     name: str
     transaction_type: TransactionType
+    # is_included_in_budget: bool = True # to be implemented in the future
     id: int | None = None
 
 
