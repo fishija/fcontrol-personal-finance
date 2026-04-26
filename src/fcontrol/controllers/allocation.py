@@ -157,6 +157,9 @@ class AllocationController(QObject):
             return
 
         self.allocation_performed.emit()
+        self.view.show_allocation_success_dialog(
+            self.allocation_service.prep_allocation_summary_message()
+        )
 
     def refresh_pockets(self):
         pockets = self.allocation_service.get_pockets()

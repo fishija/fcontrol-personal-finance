@@ -11,6 +11,8 @@ class TransactionController(QObject):
         self.view = view
         self.service = service
 
+        self.refresh()
+
     def _on_add(self, amount: float, date: str, category: str, description: str):
         error = self.service.add_transaction(amount, date, category, description)
         if error:

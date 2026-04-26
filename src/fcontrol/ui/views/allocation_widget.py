@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QTableWidget, QTableWidgetItem
+from PySide6.QtWidgets import QTableWidget, QTableWidgetItem, QMessageBox
 from PySide6.QtCore import Signal, Qt
 
 from fcontrol.ui.views.base import BaseWidget, LabelState
@@ -178,6 +178,9 @@ class AllocationWidget(Ui_AllocationWidget, BaseWidget):
         self.pocketSelect.setCurrentIndex(0)
         self.allocationTypeSelect.setCurrentIndex(0)
         self.ruleValueInput.setValue(0.00)
+
+    def show_allocation_success_dialog(self, message: str):
+        QMessageBox.information(self, "Allocation Successful", message)
 
     def refresh(self):
         # Clear selection and reset inputs when refreshing

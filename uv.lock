@@ -21,10 +21,20 @@ wheels = [
 ]
 
 [[package]]
+name = "currencyconverter"
+version = "0.18.17"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/48/92/4df3d093ebd7d479327c6951ee3edb9567e4aa058efda738a4369d8abc6f/currencyconverter-0.18.17.tar.gz", hash = "sha256:ac3812d5a7573974e2c32d239f631d6f447931a5b3bcccde88e99dc4dedc8bef", size = 3838147, upload-time = "2026-04-13T17:05:53.256Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/be/c2/70d677399d1675a9d7e48cc67555fde2b8c51d536e4547fee72784269fb6/currencyconverter-0.18.17-py3-none-any.whl", hash = "sha256:c75d71a7cc794e069a807e47180f2a3d7c58975b7903c8bff66c71c4115cedd7", size = 643859, upload-time = "2026-04-13T17:05:51.425Z" },
+]
+
+[[package]]
 name = "fcontrol"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
+    { name = "currencyconverter" },
     { name = "platformdirs" },
     { name = "pyside6" },
 ]
@@ -39,6 +49,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
+    { name = "currencyconverter", specifier = ">=0.18.17" },
     { name = "platformdirs", specifier = ">=4.9.6" },
     { name = "pyside6", specifier = ">=6.10.1" },
 ]

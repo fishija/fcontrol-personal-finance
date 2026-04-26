@@ -89,6 +89,9 @@ class Application:
             self.allocation_controller.refresh
         )
         self.allocation_controller.allocation_performed.connect(
+            self.allocation_controller.refresh
+        )
+        self.allocation_controller.allocation_performed.connect(
             self.pocket_controller.refresh
         )
         self.allocation_controller.allocation_performed.connect(
