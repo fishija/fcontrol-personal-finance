@@ -50,21 +50,21 @@ class DatabaseManager:
 
     def _add_initial_data(self):
         DEFAULT_CATEGORIES = [
-            ("Food & Groceries", "expense"),
-            ("Transport", "expense"),
-            ("Housing & Utilities", "expense"),
-            ("Entertainment", "expense"),
-            ("Healthcare", "expense"),
-            ("Clothing", "expense"),
-            ("Salary", "income"),
-            ("Freelance", "income"),
-            ("Other Income", "income"),
-            ("Other Expense", "expense"),
+            (1, "Food & Groceries", "expense"),
+            (2, "Transport", "expense"),
+            (3, "Housing & Utilities", "expense"),
+            (4, "Entertainment", "expense"),
+            (5, "Healthcare", "expense"),
+            (6, "Clothing", "expense"),
+            (7, "Salary", "income"),
+            (8, "Freelance", "income"),
+            (9, "Other Income", "income"),
+            (10, "Other Expense", "expense"),
         ]
 
         # after your CREATE TABLE statement
         self.connection.executemany(
-            "INSERT OR IGNORE INTO categories (name, transaction_type) VALUES (?, ?)",
+            "INSERT OR IGNORE INTO categories (id, name, transaction_type) VALUES (?, ?, ?)",
             DEFAULT_CATEGORIES,
         )
         self.connection.commit()
