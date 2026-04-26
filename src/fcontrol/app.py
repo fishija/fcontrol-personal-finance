@@ -37,6 +37,7 @@ class Application:
         self._setup_views()
         self._setup_services()
         self._setup_controllers()
+        self._setup_controller_connections()
         self._setup_main_window()
 
     def _setup_currency_converter(self):
@@ -63,14 +64,13 @@ class Application:
     def _setup_services(self):
         self.pocket_service = PocketService(self.pocket_repository)
         self.allocation_service = AllocationService(
-            self.pocket_repository,
             self.allocation_repository,
-            self.transaction_repository,
+            self.pocket_repository,
             self.transaction_category_repository,
             self.currency_converter,
         )
         self.transaction_service = TransactionService(
-            self.transaction_repository, self.transaction_category_repository
+            self.transaction_repository, self.pocket_repository
         )
 
     def _setup_controllers(self):
@@ -84,18 +84,23 @@ class Application:
             self.transactions_widget, self.transaction_service
         )
 
+    def _setup_controller_connections(self):
         # Connections between controllers
         self.pocket_controller.pocket_repo_changed.connect(
             self.allocation_controller.refresh
         )
-        self.allocation_controller.allocation_performed.connect(
-            self.allocation_controller.refresh
+
+        # Apply transactions after allocation
+        self.allocation_controller.apply_allocation_transactions_requested.connect(
+            self.transaction_controller.apply_allocation_transactions
         )
-        self.allocation_controller.allocation_performed.connect(
+
+        # Connect transactions applied signal to refresh pockets and allocation views
+        self.transaction_controller.apply_allocation_transactions_success.connect(
+            self.allocation_controller.on_allocation_performed
+        )
+        self.transaction_controller.apply_allocation_transactions_success.connect(
             self.pocket_controller.refresh
-        )
-        self.allocation_controller.allocation_performed.connect(
-            self.transaction_controller.refresh
         )
 
     def _setup_main_window(self):

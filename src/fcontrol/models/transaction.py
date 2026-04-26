@@ -36,6 +36,22 @@ class Transaction:
     def transaction_type(self) -> TransactionType:
         return self.category.transaction_type
 
+    @property
+    def signed_amount(self) -> float:
+        return (
+            self.amount
+            if self.transaction_type == TransactionType.INCOME
+            else -self.amount
+        )
+
+    @property
+    def summary_short(self) -> str:
+        return f"{self.amount} {self.currency} to {self.pocket.name}"
+
+    @property
+    def summary_long(self) -> str:
+        return f"{self.date}: {self.amount} {self.currency} to {self.pocket.name} ({self.category.name})"
+
 
 class TransactionCategoryRepository:
     def __init__(self, db: DatabaseManager):
@@ -126,7 +142,7 @@ class TransactionRepository:
                     transaction_type=TransactionType(r["category_transaction_type"]),
                 ),
             )
-            for r in rows
+            for r in reversed(rows)
         ]
 
     def get_by_id(self, transaction_id: int) -> Transaction | None:

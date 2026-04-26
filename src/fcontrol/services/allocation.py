@@ -6,7 +6,6 @@ from fcontrol.models import (
     TransactionType,
     PocketRepository,
     AllocationRepository,
-    TransactionRepository,
     TransactionCategoryRepository,
 )
 from currency_converter import CurrencyConverter
@@ -15,15 +14,13 @@ from currency_converter import CurrencyConverter
 class AllocationService:
     def __init__(
         self,
-        pocket_repository: PocketRepository,
         allocation_repository: AllocationRepository,
-        transaction_repository: TransactionRepository,
+        pocket_repository: PocketRepository,
         transaction_category_repository: TransactionCategoryRepository,
         currency_converter: CurrencyConverter,
     ):
         self.pocket_repository = pocket_repository
         self.allocation_repository = allocation_repository
-        self.transaction_repository = transaction_repository
         self.transaction_category_repository = transaction_category_repository
         self.currency_converter = currency_converter
 
@@ -247,41 +244,23 @@ class AllocationService:
         self.calculated_results = results
         return results
 
-    def prep_allocation_summary_message(self) -> str:
-        message_lines = ["Allocation Summary:"]
-        for result in self.calculated_results:
-            line = f"- {result.rule.pocket.name}: {result.allocated_in_pocket_currency:.2f} {result.rule.pocket.currency}"
-            message_lines.append(line)
-        return "\n".join(message_lines)
+    def create_allocation_transactions(
+        self, transaction_category_id: int
+    ) -> list[Transaction]:
+        transactions = []
 
-    def perform_allocation(self, transaction_category_id: int) -> str | None:
-        # Assume that calculations have been done and results are in self.calculated_results
-        pockets_allocation = {x: 0 for x in self.pocket_repository.get_all()}
-        for result in self.calculated_results:
-            pockets_allocation[
-                result.rule.pocket
-            ] += result.allocated_in_pocket_currency
-
-        # Update pocket balances
-        for pocket, allocated_amount in pockets_allocation.items():
-            new_balance = pocket.balance + allocated_amount
-            pocket.balance = new_balance
-            self.pocket_repository.update(pocket)
-
-        # Get income category
         income_category = self.transaction_category_repository.get_by_id(
             transaction_category_id
         )
 
-        # Create transactions for allocations
         for result in self.calculated_results:
-            if result.allocated_in_income_currency > 0:
-                self.transaction_repository.insert(
+            if result.allocated_in_pocket_currency > 0:
+                transactions.append(
                     Transaction(
-                        amount=result.allocated_in_income_currency,
+                        amount=round(result.allocated_in_pocket_currency, 2),
                         pocket=result.rule.pocket,
                         category=income_category,
                         description=f"Allocation to {result.rule.pocket.name}",
                     )
                 )
-        return None
+        return transactions

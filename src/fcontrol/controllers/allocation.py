@@ -7,7 +7,9 @@ from fcontrol.services import AllocationService
 
 
 class AllocationController(QObject):
-    allocation_performed = Signal()
+    apply_allocation_transactions_requested = Signal(
+        list
+    )  # List of transactions to apply after allocation
 
     def __init__(
         self,
@@ -146,20 +148,24 @@ class AllocationController(QObject):
 
         # Input is valid, proceed with allocation
         try:
-            error = self.allocation_service.perform_allocation(transaction_category_id)
-            if error:
-                self.view.set_info_message(error, LabelState.ERROR)
-                return
+            # Create transactions based on allocation results and emit signal to apply them
+            allocation_transactions = (
+                self.allocation_service.create_allocation_transactions(
+                    transaction_category_id
+                )
+            )
+            # Emit signal with transactions to be applied by TransactionController
+            self.apply_allocation_transactions_requested.emit(allocation_transactions)
         except Exception as e:
             self.view.set_info_message(
                 f"Unexpected error during allocation: {str(e)}", LabelState.ERROR
             )
             return
 
-        self.allocation_performed.emit()
-        self.view.show_allocation_success_dialog(
-            self.allocation_service.prep_allocation_summary_message()
-        )
+    def on_allocation_performed(self, summary_message: str):
+        self.view.show_allocation_success_dialog(summary_message)
+        self.refresh_pockets()
+        self.refresh_rules()
 
     def refresh_pockets(self):
         pockets = self.allocation_service.get_pockets()
