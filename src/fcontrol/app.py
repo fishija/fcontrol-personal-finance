@@ -3,9 +3,18 @@ from PySide6.QtWidgets import QApplication
 from currency_converter import CurrencyConverter
 from fcontrol.config import APP_NAME, APP_VERSION, DB_PATH
 from fcontrol.db_manager import DatabaseManager
-from fcontrol.models import PocketRepository, AllocationRepository
-from fcontrol.services import PocketService, AllocationService
-from fcontrol.controllers import PocketController, AllocationController
+from fcontrol.models import (
+    PocketRepository,
+    AllocationRepository,
+    TransactionRepository,
+    TransactionCategoryRepository,
+)
+from fcontrol.services import PocketService, AllocationService, TransactionService
+from fcontrol.controllers import (
+    PocketController,
+    AllocationController,
+    TransactionController,
+)
 from fcontrol.ui import (
     MainWindow,
     HomeWidget,
@@ -42,6 +51,8 @@ class Application:
         self.allocation_repository = AllocationRepository(
             self.db, self.pocket_repository
         )
+        self.transaction_repository = TransactionRepository(self.db)
+        self.transaction_category_repository = TransactionCategoryRepository(self.db)
 
     def _setup_views(self):
         self.home_widget = HomeWidget()
@@ -52,7 +63,14 @@ class Application:
     def _setup_services(self):
         self.pocket_service = PocketService(self.pocket_repository)
         self.allocation_service = AllocationService(
-            self.pocket_repository, self.allocation_repository, self.currency_converter
+            self.pocket_repository,
+            self.allocation_repository,
+            self.transaction_repository,
+            self.transaction_category_repository,
+            self.currency_converter,
+        )
+        self.transaction_service = TransactionService(
+            self.transaction_repository, self.transaction_category_repository
         )
 
     def _setup_controllers(self):
@@ -62,10 +80,19 @@ class Application:
         self.allocation_controller = AllocationController(
             self.allocation_widget, self.allocation_service
         )
+        self.transaction_controller = TransactionController(
+            self.transactions_widget, self.transaction_service
+        )
 
         # Connections between controllers
         self.pocket_controller.pocket_repo_changed.connect(
             self.allocation_controller.refresh
+        )
+        self.allocation_controller.allocation_performed.connect(
+            self.pocket_controller.refresh
+        )
+        self.allocation_controller.allocation_performed.connect(
+            self.transaction_controller.refresh
         )
 
     def _setup_main_window(self):

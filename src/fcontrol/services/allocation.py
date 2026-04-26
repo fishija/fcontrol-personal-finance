@@ -2,8 +2,11 @@ from fcontrol.models import (
     AllocationRule,
     AllocationResult,
     AllocationType,
+    TransactionType,
     PocketRepository,
     AllocationRepository,
+    TransactionRepository,
+    TransactionCategoryRepository,
 )
 from currency_converter import CurrencyConverter
 
@@ -13,10 +16,14 @@ class AllocationService:
         self,
         pocket_repository: PocketRepository,
         allocation_repository: AllocationRepository,
+        transaction_repository: TransactionRepository,
+        transaction_category_repository: TransactionCategoryRepository,
         currency_converter: CurrencyConverter,
     ):
         self.pocket_repository = pocket_repository
         self.allocation_repository = allocation_repository
+        self.transaction_repository = transaction_repository
+        self.transaction_category_repository = transaction_category_repository
         self.currency_converter = currency_converter
 
         self.calculated_results = []
@@ -104,6 +111,11 @@ class AllocationService:
 
     def get_pockets(self):
         return self.pocket_repository.get_all()
+
+    def get_income_categories(self):
+        return self.transaction_category_repository.get_all(
+            transaction_type=TransactionType.INCOME
+        )
 
     def get_allocation_rules(self):
         return self.allocation_repository.get_all()
