@@ -1,4 +1,4 @@
-from PySide6.QtCore import QObject
+from PySide6.QtCore import QObject, Signal
 
 from fcontrol.ui.views.base import LabelState
 from fcontrol.ui import AllocationWidget, AllocationRuleEditDialog
@@ -7,6 +7,8 @@ from fcontrol.services import AllocationService
 
 
 class AllocationController(QObject):
+    allocation_performed = Signal()
+
     def __init__(
         self,
         view: AllocationWidget,
@@ -125,11 +127,28 @@ class AllocationController(QObject):
             self.view.set_info_message("Allocation looks good!", LabelState.SUCCESS)
 
     def _on_allocate_clicked(self):
-        self.allocation_service.perform_allocation()
+        transaction_category_id = self.view.get_selected_category_id()
+
+        try:
+            error = self.allocation_service.perform_allocation(transaction_category_id)
+            if error:
+                self.view.set_info_message(error, LabelState.ERROR)
+                return
+        except Exception as e:
+            self.view.set_info_message(
+                f"Unexpected error during allocation: {str(e)}", LabelState.ERROR
+            )
+            return
+
+        self.allocation_performed.emit()
 
     def refresh_pockets(self):
         pockets = self.allocation_service.get_pockets()
         self.view.populate_pockets(pockets)
+
+    def refresh_income_categories(self):
+        categories = self.allocation_service.get_income_categories()
+        self.view.populate_income_categories(categories)
 
     def refresh_rules(self):
         rules = self.allocation_service.get_allocation_rules()
@@ -152,3 +171,4 @@ class AllocationController(QObject):
     def refresh(self):
         self.refresh_pockets()
         self.refresh_rules()
+        self.refresh_income_categories()
