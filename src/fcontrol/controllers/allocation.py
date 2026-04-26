@@ -127,8 +127,24 @@ class AllocationController(QObject):
             self.view.set_info_message("Allocation looks good!", LabelState.SUCCESS)
 
     def _on_allocate_clicked(self):
+        # perform basic input validation before calling service method
+        income_value, _ = self.view.get_income_data()
         transaction_category_id = self.view.get_selected_category_id()
 
+        if income_value <= 0:
+            self.view.set_info_message(
+                "Please enter a valid income amount greater than 0.", LabelState.ERROR
+            )
+            return
+        elif not transaction_category_id:
+            self.view.set_info_message(
+                "Please select an income category for allocation.", LabelState.ERROR
+            )
+            return
+        else:
+            self.view.set_info_message("")
+
+        # Input is valid, proceed with allocation
         try:
             error = self.allocation_service.perform_allocation(transaction_category_id)
             if error:
