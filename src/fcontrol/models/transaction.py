@@ -19,7 +19,7 @@ class TransactionType(Enum):
 
 
 @dataclass
-class Category:
+class TransactionCategory:
     name: str
     transaction_type: TransactionType
     id: int | None = None
@@ -29,7 +29,7 @@ class Category:
 class Transaction:
     amount: float
     pocket: Pocket
-    category: Category
+    category: TransactionCategory
     date: datetime.date = field(default_factory=datetime.date.today)
     description: str = ""
     id: int | None = None
@@ -43,14 +43,14 @@ class Transaction:
         return self.category.transaction_type
 
 
-class CategoryRepository:
+class TransactionCategoryRepository:
     def __init__(self, db: DatabaseManager):
         self.db = db
 
-    def get_all(self) -> list[Category]:
+    def get_all(self) -> list[TransactionCategory]:
         rows = self.db.fetch_all("SELECT id, name, transaction_type FROM categories")
         return [
-            Category(
+            TransactionCategory(
                 id=r["id"],
                 name=r["name"],
                 transaction_type=TransactionType(r["transaction_type"]),
@@ -58,27 +58,27 @@ class CategoryRepository:
             for r in rows
         ]
 
-    def get_by_id(self, category_id: int) -> Category | None:
+    def get_by_id(self, category_id: int) -> TransactionCategory | None:
         row = self.db.fetch_one(
             "SELECT id, name, transaction_type FROM categories WHERE id = ?",
             (category_id,),
         )
         if row:
-            return Category(
+            return TransactionCategory(
                 id=row["id"],
                 name=row["name"],
                 transaction_type=TransactionType(row["transaction_type"]),
             )
         return None
 
-    def insert(self, category: Category) -> Category:
+    def insert(self, category: TransactionCategory) -> TransactionCategory:
         category.id = self.db.execute(
             "INSERT INTO categories (name, transaction_type) VALUES (?, ?)",
             (category.name, category.transaction_type.value),
         )
         return category
 
-    def update(self, category: Category) -> None:
+    def update(self, category: TransactionCategory) -> None:
         self.db.execute(
             "UPDATE categories SET name = ?, transaction_type = ? WHERE id = ?",
             (category.name, category.transaction_type.value, category.id),
@@ -116,7 +116,7 @@ class TransactionRepository:
                     balance=r["pocket_balance"],
                     currency=r["pocket_currency"],
                 ),
-                category=Category(
+                category=TransactionCategory(
                     id=r["category_id"],
                     name=r["category_name"],
                     transaction_type=TransactionType(r["category_transaction_type"]),
@@ -150,7 +150,7 @@ class TransactionRepository:
                     balance=row["pocket_balance"],
                     currency=row["pocket_currency"],
                 ),
-                category=Category(
+                category=TransactionCategory(
                     id=row["category_id"],
                     name=row["category_name"],
                     transaction_type=TransactionType(row["category_transaction_type"]),
