@@ -6,7 +6,8 @@ from fcontrol.services import TransactionService
 
 
 class TransactionController(QObject):
-    apply_allocation_transactions_success = Signal(str)  # allocation summary message
+    transactions_applied = Signal()
+    allocation_transactions_applied = Signal()
 
     def __init__(self, view: TransactionsWidget, service: TransactionService):
         super().__init__()
@@ -26,21 +27,15 @@ class TransactionController(QObject):
     def _apply_transactions(self, transactions: list[Transaction]):
         for transaction in transactions:
             self.service.apply_transaction(transaction)
-
         self.refresh()
 
     def apply_allocation_transactions(self, transactions: list[Transaction]):
         self._apply_transactions(transactions)
+        self.allocation_transactions_applied.emit()
 
-        # Prepare summary message for the allocation results
-        if not transactions:
-            return "No transactions were created during allocation."
-
-        summary_message = "Allocation created the following transactions:\n\n"
-        for t in transactions:
-            summary_message += f"{t.summary_short}\n"
-
-        self.apply_allocation_transactions_success.emit(summary_message)
+    def apply_transactions(self, transactions: list[Transaction]):
+        self._apply_transactions(transactions)
+        self.transactions_applied.emit()
 
     def refresh(self):
         transactions = self.service.get_transactions()

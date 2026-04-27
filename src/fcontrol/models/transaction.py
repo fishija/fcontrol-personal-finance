@@ -49,11 +49,11 @@ class Transaction:
 
     @property
     def summary_short(self) -> str:
-        return f"{self.amount} {self.currency} to {self.pocket.name}"
+        return f"{self.signed_amount} {self.currency} {self.pocket.name}"
 
     @property
     def summary_long(self) -> str:
-        return f"{self.date}: {self.amount} {self.currency} to {self.pocket.name} ({self.category.name})"
+        return f"{self.date}: {self.signed_amount} {self.currency} {self.pocket.name} ({self.source.value}, {self.category.name if self.category else 'No category'})"
 
 
 class TransactionCategoryRepository:
@@ -99,8 +99,8 @@ class TransactionRepository:
                    c.id as category_id, c.name as category_name
             FROM transactions t
             JOIN pockets p ON t.pocket_id = p.id
-            JOIN categories c ON t.category_id = c.id
-            ORDER BY t.date DESC
+            LEFT JOIN categories c ON t.category_id = c.id
+            ORDER BY t.date DESC, t.id DESC
             """
         )
         transactions = []
@@ -108,7 +108,11 @@ class TransactionRepository:
             pocket = Pocket(
                 id=r["pocket_id"], name=r["pocket_name"], currency=r["pocket_currency"]
             )
-            category = TransactionCategory(id=r["category_id"], name=r["category_name"])
+            category = (
+                TransactionCategory(id=r["category_id"], name=r["category_name"])
+                if r["category_id"]
+                else None
+            )
             transaction = Transaction(
                 id=r["id"],
                 amount=r["amount"],
@@ -130,7 +134,7 @@ class TransactionRepository:
                    c.id as category_id, c.name as category_name
             FROM transactions t
             JOIN pockets p ON t.pocket_id = p.id
-            JOIN categories c ON t.category_id = c.id
+            LEFT JOIN categories c ON t.category_id = c.id
             WHERE t.id = ?
             """,
             (transaction_id,),
@@ -141,8 +145,10 @@ class TransactionRepository:
                 name=row["pocket_name"],
                 currency=row["pocket_currency"],
             )
-            category = TransactionCategory(
-                id=row["category_id"], name=row["category_name"]
+            category = (
+                TransactionCategory(id=row["category_id"], name=row["category_name"])
+                if row["category_id"]
+                else None
             )
             return Transaction(
                 id=row["id"],
@@ -165,7 +171,7 @@ class TransactionRepository:
             (
                 transaction.amount,
                 transaction.pocket.id,
-                transaction.category.id,
+                transaction.category.id if transaction.category else None,
                 transaction.date.isoformat(),
                 transaction.description,
                 transaction.transaction_type.value,
@@ -184,7 +190,7 @@ class TransactionRepository:
             (
                 transaction.amount,
                 transaction.pocket.id,
-                transaction.category.id,
+                transaction.category.id if transaction.category else None,
                 transaction.date.isoformat(),
                 transaction.description,
                 transaction.transaction_type.value,

@@ -85,22 +85,28 @@ class Application:
         )
 
     def _setup_controller_connections(self):
-        # Connections between controllers
+        # Connections between controllers - pocket
         self.pocket_controller.pocket_repo_changed.connect(
             self.allocation_controller.refresh
         )
-
-        # Apply transactions after allocation
-        self.allocation_controller.apply_allocation_transactions_requested.connect(
-            self.transaction_controller.apply_allocation_transactions
+        self.pocket_controller.pocket_repo_changed.connect(
+            self.transaction_controller.refresh
+        )
+        self.pocket_controller.apply_transactions_requested.connect(
+            self.transaction_controller.apply_transactions
         )
 
-        # Connect transactions applied signal to refresh pockets and allocation views
-        self.transaction_controller.apply_allocation_transactions_success.connect(
-            self.allocation_controller.on_allocation_performed
-        )
-        self.transaction_controller.apply_allocation_transactions_success.connect(
+        # Connections between controllers - allocation
+        # self.allocation_controller.apply_allocation_transactions_requested.connect(
+        #     self.transaction_controller.apply_allocation_transactions
+        # )
+
+        # Connections between controllers - transactions
+        self.transaction_controller.transactions_applied.connect(
             self.pocket_controller.refresh
+        )
+        self.transaction_controller.transactions_applied.connect(
+            self.allocation_controller.refresh
         )
 
     def _setup_main_window(self):
