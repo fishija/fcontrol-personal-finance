@@ -43,5 +43,6 @@ class TransactionService:
         pocket.balance += transaction.signed_amount
         self.pocket_repository.update(pocket)
 
-        # Save the transaction
-        self.transaction_repository.insert(transaction)
+        # Save the transaction only if it has a non-zero amount
+        if transaction.signed_amount != 0:
+            self.transaction_repository.insert(transaction)
