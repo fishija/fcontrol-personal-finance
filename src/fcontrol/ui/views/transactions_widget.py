@@ -27,8 +27,8 @@ class TransactionsWidget(Ui_TransactionsWidget, BaseWidget):
         self.categoriesList.setEditTriggers(QListWidget.EditTrigger.NoEditTriggers)
 
     def _connect_signals(self):
-        self.addButton.clicked.connect(self._on_add)
-        self.deleteButton.clicked.connect(self._on_delete)
+        self.addCategoryButton.clicked.connect(self._on_add)
+        self.deleteCategoryButton.clicked.connect(self._on_delete)
 
     def _set_initial_state(self):
         self.infoLabel.setText("")
@@ -36,7 +36,7 @@ class TransactionsWidget(Ui_TransactionsWidget, BaseWidget):
         self.categoriesList.clear()
 
     def _on_add(self):
-        name_input = self.nameInput.text().strip()
+        name_input = self.categoryNameInput.text().strip()
         if not name_input:
             self.set_info_message(
                 "Category name cannot be empty", state=LabelState.ERROR
@@ -63,7 +63,7 @@ class TransactionsWidget(Ui_TransactionsWidget, BaseWidget):
         self._set_label(self.infoLabel, message, state=state)
 
     def clear_add_category_input(self):
-        self.nameInput.clear()
+        self.categoryNameInput.clear()
 
     def populate_transactions_list(self, transactions: list[Transaction]):
         self.transactionsList.clear()
