@@ -20,6 +20,7 @@ class PocketEditDialog(Ui_PocketEditDialog, BaseDialog):
         self.balanceInput.setDecimals(2)
 
         self.currencySelect.addItems(CURRENCIES)
+        self.currencySelect.setEnabled(False)
 
     def _populate(self, pocket):
         # Populate current lineEdit fields first (left side)
