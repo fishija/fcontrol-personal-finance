@@ -39,7 +39,6 @@ class TransactionController(QObject):
         self.category_repo_changed.emit()
 
     def _on_delete_category(self, category_id: int):
-        print(category_id)
         try:
             self.service.delete_category(category_id)
             self.refresh()

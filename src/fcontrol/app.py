@@ -107,9 +107,6 @@ class Application:
         self.transaction_controller.category_repo_changed.connect(
             self.allocation_controller.refresh
         )
-        self.transaction_controller.category_repo_changed.connect(
-            self.transaction_controller.refresh
-        )
 
         # Connections between controllers - transactions
         self.transaction_controller.transactions_applied.connect(
