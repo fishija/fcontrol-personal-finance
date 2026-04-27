@@ -30,7 +30,7 @@ class Transaction:
     pocket: Pocket
     transaction_type: TransactionType
     date: datetime.date = field(default_factory=datetime.date.today)
-    category: TransactionCategory = None
+    category: TransactionCategory | None = None
     source: TransactionSource = TransactionSource.MANUAL
     description: str = ""
     id: int | None = None

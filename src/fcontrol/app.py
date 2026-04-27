@@ -70,7 +70,9 @@ class Application:
             self.currency_converter,
         )
         self.transaction_service = TransactionService(
-            self.transaction_repository, self.pocket_repository
+            self.transaction_repository,
+            self.transaction_category_repository,
+            self.pocket_repository,
         )
 
     def _setup_controllers(self):
@@ -99,6 +101,14 @@ class Application:
         )
         self.allocation_controller.apply_transactions_request.connect(
             self.transaction_controller.apply_transactions
+        )
+
+        # Connect category repo changed
+        self.transaction_controller.category_repo_changed.connect(
+            self.allocation_controller.refresh
+        )
+        self.transaction_controller.category_repo_changed.connect(
+            self.transaction_controller.refresh
         )
 
         # Connections between controllers - transactions
