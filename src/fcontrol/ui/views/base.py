@@ -1,7 +1,7 @@
 import enum
 
-from PySide6.QtWidgets import QWidget, QDialog, QTableWidget, QMessageBox, QLabel
-from PySide6.QtCore import Qt
+from PySide6.QtWidgets import QWidget, QDialog, QMessageBox, QLabel
+from PySide6.QtCore import Qt, QObject
 
 
 class LabelState(enum.Enum):
@@ -32,8 +32,8 @@ class BaseWidget(QWidget, BaseObject):
     def __init__(self):
         super().__init__()
 
-    def get_selected_row_id(self, table: QTableWidget) -> int | None:
-        selected_items = table.selectedItems()
+    def get_selected_row_id(self, obj: QObject) -> int | None:
+        selected_items = obj.selectedItems()
         if not selected_items:
             return None
 
@@ -43,7 +43,7 @@ class BaseWidget(QWidget, BaseObject):
             if item_id is not None:
                 return item_id
 
-        return selected_items[item_id].data(Qt.ItemDataRole.UserRole)
+        return None
 
     def ask_for_confirmation(self, message: str) -> bool:
         reply = QMessageBox.question(
