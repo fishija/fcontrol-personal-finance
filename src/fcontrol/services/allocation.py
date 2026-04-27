@@ -4,6 +4,7 @@ from fcontrol.models import (
     AllocationType,
     Transaction,
     TransactionType,
+    TransactionSource,
     PocketRepository,
     AllocationRepository,
     TransactionCategoryRepository,
@@ -111,9 +112,7 @@ class AllocationService:
         return self.pocket_repository.get_all()
 
     def get_income_categories(self):
-        return self.transaction_category_repository.get_all(
-            transaction_type=TransactionType.INCOME
-        )
+        return self.transaction_category_repository.get_all()
 
     def get_allocation_rules(self):
         return self.allocation_repository.get_all()
@@ -245,22 +244,27 @@ class AllocationService:
         return results
 
     def create_allocation_transactions(
-        self, transaction_category_id: int
+        self, transaction_category_id: int | None
     ) -> list[Transaction]:
         transactions = []
 
-        income_category = self.transaction_category_repository.get_by_id(
-            transaction_category_id
-        )
+        if transaction_category_id is None:
+            income_category = None
+        else:
+            income_category = self.transaction_category_repository.get_by_id(
+                transaction_category_id
+            )
 
         for result in self.calculated_results:
             if result.allocated_in_pocket_currency > 0:
                 transactions.append(
                     Transaction(
-                        amount=round(result.allocated_in_pocket_currency, 2),
+                        amount=abs(round(result.allocated_in_pocket_currency, 2)),
                         pocket=result.rule.pocket,
+                        transaction_type=TransactionType.INCOME,
                         category=income_category,
-                        description=f"Allocation to {result.rule.pocket.name}",
+                        source=TransactionSource.ALLOCATION,
+                        description="Income allocation",
                     )
                 )
         return transactions

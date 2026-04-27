@@ -7,8 +7,8 @@ from fcontrol.services import AllocationService
 
 
 class AllocationController(QObject):
-    apply_allocation_transactions_requested = Signal(
-        list
+    apply_transactions_request = Signal(
+        list, object
     )  # List of transactions to apply after allocation
 
     def __init__(
@@ -138,11 +138,6 @@ class AllocationController(QObject):
                 "Please enter a valid income amount greater than 0.", LabelState.ERROR
             )
             return
-        elif not transaction_category_id:
-            self.view.set_info_message(
-                "Please select an income category for allocation.", LabelState.ERROR
-            )
-            return
         else:
             self.view.set_info_message("")
 
@@ -154,18 +149,24 @@ class AllocationController(QObject):
                     transaction_category_id
                 )
             )
-            # Emit signal with transactions to be applied by TransactionController
-            self.apply_allocation_transactions_requested.emit(allocation_transactions)
         except Exception as e:
             self.view.set_info_message(
                 f"Unexpected error during allocation: {str(e)}", LabelState.ERROR
             )
             return
 
-    def on_allocation_performed(self, summary_message: str):
-        self.view.show_allocation_success_dialog(summary_message)
-        self.refresh_pockets()
-        self.refresh_rules()
+        # Emit signal with transactions to be applied by TransactionController
+        self.apply_transactions_request.emit(
+            allocation_transactions, self.on_allocation_performed
+        )
+
+    def on_allocation_performed(self, success: bool, message: str):
+        if success:
+            self.view.show_allocation_success_dialog(message)
+            self.refresh_pockets()
+            self.refresh_rules()
+        else:
+            self.view.set_info_message(message, LabelState.ERROR)
 
     def refresh_pockets(self):
         pockets = self.allocation_service.get_pockets()

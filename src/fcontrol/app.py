@@ -92,14 +92,14 @@ class Application:
         self.pocket_controller.pocket_repo_changed.connect(
             self.transaction_controller.refresh
         )
+
+        # Connect apply transactions
         self.pocket_controller.apply_transactions_requested.connect(
             self.transaction_controller.apply_transactions
         )
-
-        # Connections between controllers - allocation
-        # self.allocation_controller.apply_allocation_transactions_requested.connect(
-        #     self.transaction_controller.apply_allocation_transactions
-        # )
+        self.allocation_controller.apply_transactions_request.connect(
+            self.transaction_controller.apply_transactions
+        )
 
         # Connections between controllers - transactions
         self.transaction_controller.transactions_applied.connect(

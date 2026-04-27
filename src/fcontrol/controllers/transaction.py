@@ -3,6 +3,11 @@ from PySide6.QtCore import QObject, Signal
 from fcontrol.models import Transaction
 from fcontrol.ui import TransactionsWidget
 from fcontrol.services import TransactionService
+from typing import Protocol
+
+
+class ApplyTransactionsCallback(Protocol):
+    def __call__(self, success: bool, message: str) -> None: ...
 
 
 class TransactionController(QObject):
@@ -24,18 +29,25 @@ class TransactionController(QObject):
 
         self.refresh()
 
-    def _apply_transactions(self, transactions: list[Transaction]):
-        for transaction in transactions:
-            self.service.apply_transaction(transaction)
+    def apply_transactions(
+        self,
+        transactions: list[Transaction],
+        callback: ApplyTransactionsCallback | None = None,
+    ):
+        try:
+            for transaction in transactions:
+                self.service.apply_transaction(transaction)
+        except Exception as e:
+            if callback:
+                callback(False, str(e))
+            return
         self.refresh()
-
-    def apply_allocation_transactions(self, transactions: list[Transaction]):
-        self._apply_transactions(transactions)
-        self.allocation_transactions_applied.emit()
-
-    def apply_transactions(self, transactions: list[Transaction]):
-        self._apply_transactions(transactions)
         self.transactions_applied.emit()
+        if callback:
+            callback(
+                True,
+                f"Transaction{'' if len(transactions) == 1 else 's'} applied successfully.",
+            )
 
     def refresh(self):
         transactions = self.service.get_transactions()
