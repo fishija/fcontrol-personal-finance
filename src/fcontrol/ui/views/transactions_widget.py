@@ -51,6 +51,12 @@ class TransactionsWidget(Ui_TransactionsWidget, BaseWidget):
                 "Please select a category to delete", state=LabelState.ERROR
             )
             return
+
+        confirmation = self.ask_for_confirmation(
+            "Are you sure you want to delete the selected category?"
+        )
+        if not confirmation:
+            return
         self.delete_category_request.emit(category_id)
 
     def set_info_message(self, message: str, state: LabelState = LabelState.DEFAULT):
