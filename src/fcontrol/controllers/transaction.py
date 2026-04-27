@@ -43,7 +43,6 @@ class TransactionController(QObject):
         try:
             self.service.delete_category(category_id)
             self.refresh()
-            self.view.set_info_message(f"Category deleted successfully.")
         except Exception as e:
             self.view.set_info_message(str(e), state=LabelState.ERROR)
         self.category_repo_changed.emit()
