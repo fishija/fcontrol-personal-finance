@@ -17,8 +17,8 @@ class TransactionsWidget(Ui_TransactionsWidget, BaseWidget):
     delete_category_request = Signal(int)  # category_id
 
     add_transaction_request = Signal(
-        float, int, TransactionType, TransactionSource, datetime.date, int | None, str
-    )  # amount, pocket_id, transaction_type, source, date, category_id, description
+        float, int, TransactionType, TransactionSource, datetime.date, object, str
+    )  # amount, pocket_id, transaction_type, source, date, category_id (int | None), description
     delete_transaction_request = Signal(int)  # transaction_id
 
     def __init__(self):
@@ -88,10 +88,44 @@ class TransactionsWidget(Ui_TransactionsWidget, BaseWidget):
         self.delete_category_request.emit(category_id)
 
     def _on_add_transaction(self):
-        pass
+        amount = self.transactionAmountInput.value()
+        pocket_id = self.transactionPocketSelect.currentData()
+        transaction_type_str = self.transactionTypeSelect.currentText()
+        transaction_type = TransactionType(transaction_type_str)
+        source = TransactionSource.MANUAL
+        date = self.transactionDateInput.date().toPython()
+        category_id = self.transactionCategorySelect.currentData()
+        description = self.transactionDescriptionInput.text().strip()
+
+        if pocket_id is None:
+            self.set_info_message(
+                "Please select a pocket for the transaction", state=LabelState.ERROR
+            )
+            return
+        elif amount <= 0:
+            self.set_info_message(
+                "Please enter an amount greater than zero", state=LabelState.ERROR
+            )
+            return
+
+        self.add_transaction_request.emit(
+            amount, pocket_id, transaction_type, source, date, category_id, description
+        )
 
     def _on_delete_transaction(self):
-        pass
+        transaction_id = self.get_selected_row_id(self.transactionsList)
+        if transaction_id is None:
+            self.set_info_message(
+                "Please select a transaction to delete", state=LabelState.ERROR
+            )
+            return
+
+        confirmation = self.ask_for_confirmation(
+            "Are you sure you want to delete the selected transaction?"
+        )
+        if not confirmation:
+            return
+        self.delete_transaction_request.emit(transaction_id)
 
     def set_info_message(self, message: str, state: LabelState = LabelState.DEFAULT):
         self._set_label(self.infoLabel, message, state=state)
