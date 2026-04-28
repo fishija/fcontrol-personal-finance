@@ -89,6 +89,7 @@ class TransactionService:
 
         # Reverse the transaction's effect on the pocket balance
         pocket.balance -= transaction.signed_amount
+        self.pocket_repository.update(pocket)
 
         # Now delete the transaction
         self.transaction_repository.delete(transaction.id)
