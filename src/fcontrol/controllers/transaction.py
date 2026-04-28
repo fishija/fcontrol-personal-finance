@@ -1,9 +1,10 @@
 from PySide6.QtCore import QObject, Signal
 
-from fcontrol.models import Transaction
+from fcontrol.models import Transaction, TransactionType, TransactionSource
 from fcontrol.ui import TransactionsWidget
 from fcontrol.services import TransactionService
 from typing import Protocol
+import datetime
 
 from fcontrol.ui.views.base import LabelState
 
@@ -13,7 +14,7 @@ class ApplyTransactionsCallback(Protocol):
 
 
 class TransactionController(QObject):
-    transactions_applied = Signal()
+    transaction_repo_changed = Signal()
     category_repo_changed = Signal()
 
     def __init__(self, view: TransactionsWidget, service: TransactionService):
@@ -27,6 +28,9 @@ class TransactionController(QObject):
     def _connect_signals(self):
         self.view.add_category_request.connect(self._on_add_category)
         self.view.delete_category_request.connect(self._on_delete_category)
+
+        self.view.add_transaction_request.connect(self._on_add_transaction)
+        self.view.delete_transaction_request.connect(self._on_delete_transaction)
 
     def _on_add_category(self, category_name: str):
         try:
@@ -46,6 +50,39 @@ class TransactionController(QObject):
             self.view.set_info_message(str(e), state=LabelState.ERROR)
         self.category_repo_changed.emit()
 
+    def _on_add_transaction(
+        self,
+        amount: float,
+        pocket_id: int,
+        transaction_type: TransactionType,
+        source: TransactionSource,
+        date: datetime.date,
+        category_id: int | None = None,
+        description: str = "",
+    ):
+        try:
+            self.service.add_transaction(
+                amount=amount,
+                pocket_id=pocket_id,
+                transaction_type=transaction_type,
+                source=source,
+                date=date,
+                category_id=category_id,
+                description=description,
+            )
+        except Exception as e:
+            self.view.set_info_message(str(e), state=LabelState.ERROR)
+        self.refresh()
+        self.transaction_repo_changed.emit()
+
+    def _on_delete_transaction(self, transaction_id: int):
+        try:
+            self.service.delete_transaction(transaction_id)
+        except Exception as e:
+            self.view.set_info_message(str(e), state=LabelState.ERROR)
+        self.refresh()
+        self.transaction_repo_changed.emit()
+
     def apply_transactions(
         self,
         transactions: list[Transaction],
@@ -59,7 +96,7 @@ class TransactionController(QObject):
                 callback(False, str(e))
             return
         self.refresh()
-        self.transactions_applied.emit()
+        self.transaction_repo_changed.emit()
         if callback:
             callback(
                 True,
@@ -68,7 +105,10 @@ class TransactionController(QObject):
 
     def refresh(self):
         transactions = self.service.get_transactions()
+        pockets = self.service.get_pockets()
         categories = self.service.get_categories()
 
         self.view.populate_transactions_list(transactions)
         self.view.populate_categories_list(categories)
+        self.view.populate_pockets_select(pockets)
+        self.view.populate_category_select(categories)

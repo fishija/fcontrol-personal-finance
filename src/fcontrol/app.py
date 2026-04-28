@@ -109,10 +109,10 @@ class Application:
         )
 
         # Connections between controllers - transactions
-        self.transaction_controller.transactions_applied.connect(
+        self.transaction_controller.transaction_repo_changed.connect(
             self.pocket_controller.refresh
         )
-        self.transaction_controller.transactions_applied.connect(
+        self.transaction_controller.transaction_repo_changed.connect(
             self.allocation_controller.refresh
         )
 
