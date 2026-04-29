@@ -15,7 +15,7 @@ class PocketEditDialog(Ui_PocketEditDialog, BaseDialog):
         self.infoLabel.setText("")
 
     def _set_inputs(self):
-        self.balanceInput.setMinimum(0)
+        self.balanceInput.setMinimum(-1_000_000_000)
         self.balanceInput.setMaximum(1_000_000_000)
         self.balanceInput.setDecimals(2)
 

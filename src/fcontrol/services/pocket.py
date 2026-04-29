@@ -19,8 +19,6 @@ class PocketService:
     ) -> str | None:
         if not name.strip():
             return "Pocket name cannot be empty."
-        if balance < 0:
-            return "Balance cannot be negative."
         if not currency.strip():
             return "Currency cannot be empty."
         return None
@@ -41,10 +39,14 @@ class PocketService:
         new_pocket = Pocket(name=name, currency=currency)
         self.pocket_repository.insert(new_pocket)
 
+        transaction_type = (
+            TransactionType.INCOME if balance >= 0 else TransactionType.EXPENSE
+        )
+
         # Create a transaction for the initial balance
         initial_transaction = Transaction(
             amount=abs(balance),
-            transaction_type=TransactionType.INCOME,
+            transaction_type=transaction_type,
             source=TransactionSource.OPENING_BALANCE,
             pocket=new_pocket,
         )

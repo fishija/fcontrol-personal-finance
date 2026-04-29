@@ -25,7 +25,7 @@ class PocketsWidget(Ui_PocketsWidget, BaseWidget):
     def _setup_inputs(self):
         self.nameInput.setPlaceholderText("Pocket Name")
 
-        self.balanceInput.setMinimum(0)
+        self.balanceInput.setMinimum(-1_000_000_000)
         self.balanceInput.setMaximum(1_000_000_000)
         self.balanceInput.setDecimals(2)
         self.balanceInput.setValue(0.00)
