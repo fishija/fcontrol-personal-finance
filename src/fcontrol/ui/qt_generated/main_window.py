@@ -55,6 +55,11 @@ class Ui_MainWindow(object):
 
         self.verticalLayout.addWidget(self.transactionsButton)
 
+        self.goalsButton = QPushButton(self.frame)
+        self.goalsButton.setObjectName(u"goalsButton")
+
+        self.verticalLayout.addWidget(self.goalsButton)
+
         self.verticalSpacer = QSpacerItem(20, 366, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
         self.verticalLayout.addItem(self.verticalSpacer)
@@ -87,5 +92,6 @@ class Ui_MainWindow(object):
         self.allocationButton.setText(QCoreApplication.translate("MainWindow", u"Allocation", None))
         self.pocketsButton.setText(QCoreApplication.translate("MainWindow", u"Pockets", None))
         self.transactionsButton.setText(QCoreApplication.translate("MainWindow", u"Transactions", None))
+        self.goalsButton.setText(QCoreApplication.translate("MainWindow", u"Goals", None))
     # retranslateUi
 

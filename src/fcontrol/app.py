@@ -21,6 +21,7 @@ from fcontrol.ui import (
     AllocationWidget,
     PocketsWidget,
     TransactionsWidget,
+    GoalsWidget,
 )
 
 
@@ -60,6 +61,7 @@ class Application:
         self.allocation_widget = AllocationWidget()
         self.pockets_widget = PocketsWidget()
         self.transactions_widget = TransactionsWidget()
+        self.goals_widget = GoalsWidget()
 
     def _setup_services(self):
         self.pocket_service = PocketService(self.pocket_repository)
@@ -122,6 +124,7 @@ class Application:
             allocation_widget=self.allocation_widget,
             pockets_widget=self.pockets_widget,
             transactions_widget=self.transactions_widget,
+            goals_widget=self.goals_widget,
         )
         self.main_window.setWindowTitle(f"{APP_NAME} {APP_VERSION}")
 
