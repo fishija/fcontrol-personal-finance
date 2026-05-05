@@ -6,8 +6,8 @@ from .views import (
     TransactionsWidget,
     PocketEditDialog,
     AllocationRuleEditDialog,
+    GoalsWidget,
 )
-
 
 __all__ = [
     "MainWindow",
@@ -17,4 +17,5 @@ __all__ = [
     "TransactionsWidget",
     "PocketEditDialog",
     "AllocationRuleEditDialog",
+    "GoalsWidget",
 ]
