@@ -9,8 +9,7 @@ class DatabaseManager:
         self._add_initial_data()
 
     def _init_schema(self):
-        self.connection.executescript(
-            """
+        self.connection.executescript("""
             PRAGMA foreign_keys = ON;
 
             CREATE TABLE IF NOT EXISTS pockets (
@@ -46,8 +45,18 @@ class DatabaseManager:
                 FOREIGN KEY (pocket_id) REFERENCES pockets(id) ON DELETE CASCADE,
                 FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL
             );
-        """
-        )
+
+            CREATE TABLE IF NOT EXISTS goals (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                target_amount REAL NOT NULL,
+                current_amount REAL NOT NULL,
+                target_date TEXT,
+                description TEXT,
+                pocket_id INTEGER NOT NULL,
+                FOREIGN KEY (pocket_id) REFERENCES pockets(id) ON DELETE CASCADE
+            );
+        """)
 
     def _add_initial_data(self):
         DEFAULT_CATEGORIES = [
