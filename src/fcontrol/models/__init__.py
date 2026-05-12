@@ -13,7 +13,7 @@ from .transaction import (
     TransactionCategoryRepository,
     TransactionRepository,
 )
-
+from .goal import Goal, GoalRepository
 
 __all__ = [
     "Pocket",
@@ -28,4 +28,6 @@ __all__ = [
     "TransactionSource",
     "TransactionCategoryRepository",
     "TransactionRepository",
+    "Goal",
+    "GoalRepository",
 ]
