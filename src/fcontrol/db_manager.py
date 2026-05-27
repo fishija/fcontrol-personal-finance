@@ -6,6 +6,7 @@ class DatabaseManager:
         self.connection = sqlite3.connect(db_path)
         self.connection.row_factory = sqlite3.Row
         self._init_schema()
+        self._migrate_schema()
         self._add_initial_data()
 
     def _init_schema(self):
@@ -50,13 +51,29 @@ class DatabaseManager:
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT NOT NULL,
                 target_amount REAL NOT NULL,
-                current_amount REAL NOT NULL,
                 target_date TEXT,
                 description TEXT,
                 pocket_id INTEGER NOT NULL,
                 FOREIGN KEY (pocket_id) REFERENCES pockets(id) ON DELETE CASCADE
             );
+
+            CREATE TABLE IF NOT EXISTS goal_contributions (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                goal_id INTEGER NOT NULL,
+                amount REAL NOT NULL,
+                date TEXT NOT NULL,
+                note TEXT NOT NULL DEFAULT '',
+                FOREIGN KEY (goal_id) REFERENCES goals(id) ON DELETE CASCADE
+            );
         """)
+
+    def _migrate_schema(self):
+        # Drop current_amount from goals — now computed from goal_contributions
+        try:
+            self.connection.execute("ALTER TABLE goals DROP COLUMN current_amount")
+            self.connection.commit()
+        except Exception:
+            pass  # Already dropped or never existed
 
     def _add_initial_data(self):
         DEFAULT_CATEGORIES = [

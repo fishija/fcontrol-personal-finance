@@ -9,6 +9,8 @@ class Pocket:
     balance: float = 0.0
     id: int | None = None
     # TODO: (idea) add "type" field to distinguish between cash, card, investment accounts, etc.
+    # Computed from goal_contributions — never written to the DB
+    reserved_amount: float = 0.0
 
     def __str__(self):
         balance_str = (
@@ -27,10 +29,21 @@ class PocketRepository:
         self.db = db
 
     def get_all(self) -> list[Pocket]:
-        rows = self.db.fetch_all("SELECT id, name, balance, currency FROM pockets")
+        rows = self.db.fetch_all("""
+            SELECT p.id, p.name, p.balance, p.currency,
+                   COALESCE(SUM(gc.amount), 0) as reserved_amount
+            FROM pockets p
+            LEFT JOIN goals g ON g.pocket_id = p.id
+            LEFT JOIN goal_contributions gc ON gc.goal_id = g.id
+            GROUP BY p.id
+        """)
         return [
             Pocket(
-                id=r["id"], name=r["name"], balance=r["balance"], currency=r["currency"]
+                id=r["id"],
+                name=r["name"],
+                balance=r["balance"],
+                currency=r["currency"],
+                reserved_amount=r["reserved_amount"],
             )
             for r in rows
         ]
