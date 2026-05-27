@@ -1,4 +1,11 @@
-from fcontrol.models import Goal, GoalRepository, Pocket, PocketRepository
+from fcontrol.models import (
+    Goal,
+    GoalRepository,
+    GoalContribution,
+    GoalContributionRepository,
+    Pocket,
+    PocketRepository,
+)
 
 import datetime
 
@@ -8,9 +15,11 @@ class GoalService:
         self,
         goal_repository: GoalRepository,
         pocket_repository: PocketRepository,
+        goal_contribution_repository: GoalContributionRepository,
     ):
         self.goal_repository = goal_repository
         self.pocket_repository = pocket_repository
+        self.goal_contribution_repository = goal_contribution_repository
 
     def validate_goal_data(
         self,
@@ -95,3 +104,27 @@ class GoalService:
 
         self.goal_repository.update(goal)
         return goal
+
+    def get_contributions(self, goal_id: int) -> list[GoalContribution]:
+        return self.goal_contribution_repository.get_all_for_goal(goal_id)
+
+    def add_contribution(
+        self,
+        goal_id: int,
+        amount: float,
+        date: datetime.date,
+        note: str = "",
+    ) -> GoalContribution:
+        if amount <= 0:
+            raise ValueError("Contribution amount must be greater than zero.")
+        contribution = GoalContribution(
+            goal_id=goal_id,
+            amount=amount,
+            date=date,
+            note=note,
+        )
+        self.goal_contribution_repository.insert(contribution)
+        return contribution
+
+    def delete_contribution(self, contribution_id: int) -> None:
+        self.goal_contribution_repository.delete(contribution_id)
