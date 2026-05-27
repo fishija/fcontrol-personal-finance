@@ -34,6 +34,9 @@ class GoalService:
     def get_pockets(self) -> list[Pocket]:
         return self.pocket_repository.get_all()
 
+    def get_goal_by_id(self, goal_id: int) -> Goal | None:
+        return self.goal_repository.get_by_id(goal_id)
+
     def add_goal(
         self,
         name: str,
@@ -48,9 +51,13 @@ class GoalService:
         if error:
             raise ValueError(error)
 
+        pocket = self.pocket_repository.get_by_id(pocket_id)
+        if pocket is None:
+            raise ValueError("Selected pocket does not exist.")
+
         new_goal = Goal(
             name=name,
-            pocket_id=pocket_id,
+            pocket=pocket,
             target_amount=target_amount,
             target_date=target_date,
             description=description,
@@ -60,3 +67,31 @@ class GoalService:
 
     def delete_goal(self, goal_id: int):
         self.goal_repository.delete(goal_id)
+
+    def update_goal(
+        self,
+        goal: Goal,
+        name: str,
+        pocket_id: int,
+        target_amount: float,
+        target_date: datetime.date | None,
+        description: str,
+    ) -> Goal:
+        error = self.validate_goal_data(
+            name, pocket_id, target_amount, target_date, description
+        )
+        if error:
+            raise ValueError(error)
+
+        pocket = self.pocket_repository.get_by_id(pocket_id)
+        if pocket is None:
+            raise ValueError("Selected pocket does not exist.")
+
+        goal.name = name
+        goal.pocket = pocket
+        goal.target_amount = target_amount
+        goal.target_date = target_date
+        goal.description = description
+
+        self.goal_repository.update(goal)
+        return goal
