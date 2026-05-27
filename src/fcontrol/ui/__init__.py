@@ -7,6 +7,7 @@ from .views import (
     PocketEditDialog,
     AllocationRuleEditDialog,
     GoalsWidget,
+    GoalEditDialog,
 )
 
 __all__ = [
@@ -18,4 +19,5 @@ __all__ = [
     "PocketEditDialog",
     "AllocationRuleEditDialog",
     "GoalsWidget",
+    "GoalEditDialog",
 ]
