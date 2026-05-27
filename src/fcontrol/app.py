@@ -8,12 +8,19 @@ from fcontrol.models import (
     AllocationRepository,
     TransactionRepository,
     TransactionCategoryRepository,
+    GoalRepository,
 )
-from fcontrol.services import PocketService, AllocationService, TransactionService
+from fcontrol.services import (
+    PocketService,
+    AllocationService,
+    TransactionService,
+    GoalService,
+)
 from fcontrol.controllers import (
     PocketController,
     AllocationController,
     TransactionController,
+    GoalController,
 )
 from fcontrol.ui import (
     MainWindow,
@@ -55,6 +62,7 @@ class Application:
         )
         self.transaction_repository = TransactionRepository(self.db)
         self.transaction_category_repository = TransactionCategoryRepository(self.db)
+        self.goal_repository = GoalRepository(self.db)
 
     def _setup_views(self):
         self.home_widget = HomeWidget()
@@ -76,6 +84,10 @@ class Application:
             self.transaction_category_repository,
             self.pocket_repository,
         )
+        self.goal_service = GoalService(
+            self.goal_repository,
+            self.pocket_repository,
+        )
 
     def _setup_controllers(self):
         self.pocket_controller = PocketController(
@@ -87,6 +99,7 @@ class Application:
         self.transaction_controller = TransactionController(
             self.transactions_widget, self.transaction_service
         )
+        self.goal_controller = GoalController(self.goals_widget, self.goal_service)
 
     def _setup_controller_connections(self):
         # Connections between controllers - pocket
@@ -96,6 +109,7 @@ class Application:
         self.pocket_controller.pocket_repo_changed.connect(
             self.transaction_controller.refresh
         )
+        self.pocket_controller.pocket_repo_changed.connect(self.goal_controller.refresh)
 
         # Connect apply transactions
         self.pocket_controller.apply_transactions_requested.connect(
@@ -116,6 +130,9 @@ class Application:
         )
         self.transaction_controller.transaction_repo_changed.connect(
             self.allocation_controller.refresh
+        )
+        self.transaction_controller.transaction_repo_changed.connect(
+            self.goal_controller.refresh
         )
 
     def _setup_main_window(self):
