@@ -7,6 +7,7 @@ from .pocket_edit_dialog import PocketEditDialog
 from .allocation_rule_edit_dialog import AllocationRuleEditDialog
 from .goals_widget import GoalsWidget
 from .goal_edit_dialog import GoalEditDialog
+from .goal_contributions_dialog import GoalContributionsDialog
 
 __all__ = [
     "MainWindow",
@@ -18,4 +19,5 @@ __all__ = [
     "AllocationRuleEditDialog",
     "GoalsWidget",
     "GoalEditDialog",
+    "GoalContributionsDialog",
 ]
