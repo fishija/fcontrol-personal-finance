@@ -1,6 +1,6 @@
 import enum
 
-from PySide6.QtWidgets import QWidget, QDialog, QMessageBox, QLabel
+from PySide6.QtWidgets import QWidget, QDialog, QMessageBox, QLabel, QListWidgetItem
 from PySide6.QtCore import Qt, QObject
 
 
@@ -53,6 +53,12 @@ class BaseWidget(QWidget, BaseObject):
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
         )
         return reply == QMessageBox.StandardButton.Yes
+
+    def create_list_item(self, text: str, data=None) -> QListWidgetItem:
+        item = QListWidgetItem(text)
+        if data is not None:
+            item.setData(Qt.ItemDataRole.UserRole, data)
+        return item
 
 
 class BaseDialog(QDialog, BaseObject):
