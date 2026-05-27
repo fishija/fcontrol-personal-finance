@@ -37,8 +37,10 @@ class PocketsWidget(Ui_PocketsWidget, BaseWidget):
         self.editButton.setEnabled(False)
 
     def _setup_table(self):
-        self.pocketsTable.setColumnCount(3)
-        self.pocketsTable.setHorizontalHeaderLabels(["Name", "Balance", "Currency"])
+        self.pocketsTable.setColumnCount(4)
+        self.pocketsTable.setHorizontalHeaderLabels(
+            ["Name", "Balance", "Reserved", "Currency"]
+        )
 
         self.pocketsTable.setSelectionMode(QTableWidget.SelectionMode.SingleSelection)
         self.pocketsTable.setSelectionBehavior(
@@ -123,6 +125,19 @@ class PocketsWidget(Ui_PocketsWidget, BaseWidget):
             name_item = QTableWidgetItem(pocket.name)
             name_item.setData(Qt.ItemDataRole.UserRole, pocket.id)
 
+            reserved = pocket.reserved_amount
+            available = pocket.balance - reserved
+            reserved_text = f"{reserved:.2f}" if reserved > 0 else "—"
+
+            balance_text = f"{pocket.balance:.2f}"
+            if available != pocket.balance:
+                balance_text += f" ({available:.2f} available)"
+
             self.pocketsTable.setItem(row, 0, name_item)
-            self.pocketsTable.setItem(row, 1, QTableWidgetItem(f"{pocket.balance:.2f}"))
-            self.pocketsTable.setItem(row, 2, QTableWidgetItem(pocket.currency))
+            self.pocketsTable.setItem(
+                row,
+                1,
+                QTableWidgetItem(balance_text),
+            )
+            self.pocketsTable.setItem(row, 2, QTableWidgetItem(reserved_text))
+            self.pocketsTable.setItem(row, 3, QTableWidgetItem(pocket.currency))

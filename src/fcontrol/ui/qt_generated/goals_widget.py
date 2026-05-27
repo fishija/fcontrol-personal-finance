@@ -70,6 +70,9 @@ class Ui_GoalsWidget(object):
         self.listWidget = QListWidget(GoalsWidget)
         self.listWidget.setObjectName(u"listWidget")
         self.listWidget.setGeometry(QRect(30, 170, 411, 161))
+        self.contributionsButton = QPushButton(GoalsWidget)
+        self.contributionsButton.setObjectName(u"contributionsButton")
+        self.contributionsButton.setGeometry(QRect(30, 330, 130, 32))
         self.editButton = QPushButton(GoalsWidget)
         self.editButton.setObjectName(u"editButton")
         self.editButton.setGeometry(QRect(270, 330, 81, 32))
@@ -92,6 +95,7 @@ class Ui_GoalsWidget(object):
         self.targetDateLabel.setText(QCoreApplication.translate("GoalsWidget", u"Target date", None))
         self.label_5.setText(QCoreApplication.translate("GoalsWidget", u"Description", None))
         self.setTargetDateInput.setText(QCoreApplication.translate("GoalsWidget", u"Set target date", None))
+        self.contributionsButton.setText(QCoreApplication.translate("GoalsWidget", u"Contributions", None))
         self.editButton.setText(QCoreApplication.translate("GoalsWidget", u"Edit", None))
         self.deleteButton.setText(QCoreApplication.translate("GoalsWidget", u"Delete", None))
     # retranslateUi

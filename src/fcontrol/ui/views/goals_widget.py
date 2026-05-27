@@ -10,6 +10,7 @@ class GoalsWidget(Ui_GoalsWidget, BaseWidget):
     )  # name, pocket_id, target_amount, target_date (date | None), description
     edit_request = Signal(int)  # goal_id
     delete_request = Signal(int)  # goal_id
+    contributions_request = Signal(int)  # goal_id
 
     def __init__(self):
         super().__init__()
@@ -36,6 +37,7 @@ class GoalsWidget(Ui_GoalsWidget, BaseWidget):
 
         self.deleteButton.setEnabled(False)
         self.editButton.setEnabled(False)
+        self.contributionsButton.setEnabled(False)
 
     def _connect_signals(self):
         self.setTargetDateInput.stateChanged.connect(self._on_set_target_date_changed)
@@ -44,6 +46,7 @@ class GoalsWidget(Ui_GoalsWidget, BaseWidget):
         self.addButton.clicked.connect(self._on_add_clicked)
         self.editButton.clicked.connect(self._on_edit_clicked)
         self.deleteButton.clicked.connect(self._on_delete_clicked)
+        self.contributionsButton.clicked.connect(self._on_contributions_clicked)
 
     def _set_initial_state(self):
         self.listWidget.clearSelection()
@@ -61,6 +64,7 @@ class GoalsWidget(Ui_GoalsWidget, BaseWidget):
         has_selection = bool(self.listWidget.selectedItems())
         self.deleteButton.setEnabled(has_selection)
         self.editButton.setEnabled(has_selection)
+        self.contributionsButton.setEnabled(has_selection)
 
     def _on_add_clicked(self):
         name = self.nameInput.text().strip()
@@ -99,6 +103,11 @@ class GoalsWidget(Ui_GoalsWidget, BaseWidget):
 
             self.delete_request.emit(goal_id)
 
+    def _on_contributions_clicked(self):
+        goal_id = self.get_selected_row_id(self.listWidget)
+        if goal_id is not None:
+            self.contributions_request.emit(goal_id)
+
     def populate_pocket_select(self, pockets):
         self.pocketSelect.clear()
         for pocket in pockets:
@@ -115,4 +124,3 @@ class GoalsWidget(Ui_GoalsWidget, BaseWidget):
 
     def refresh(self):
         self._set_initial_state()
-
