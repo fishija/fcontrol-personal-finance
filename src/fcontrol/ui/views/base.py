@@ -27,17 +27,11 @@ class BaseObject:
         label.setText(message)
         label.setStyleSheet(colors[state])
 
-
-class BaseWidget(QWidget, BaseObject):
-    def __init__(self):
-        super().__init__()
-
     def get_selected_row_id(self, obj: QObject) -> int | None:
         selected_items = obj.selectedItems()
         if not selected_items:
             return None
 
-        # Check all items for a valid UserRole data
         for item in selected_items:
             item_id = item.data(Qt.ItemDataRole.UserRole)
             if item_id is not None:
@@ -59,6 +53,11 @@ class BaseWidget(QWidget, BaseObject):
         if data is not None:
             item.setData(Qt.ItemDataRole.UserRole, data)
         return item
+
+
+class BaseWidget(QWidget, BaseObject):
+    def __init__(self):
+        super().__init__()
 
 
 class BaseDialog(QDialog, BaseObject):
