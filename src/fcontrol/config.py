@@ -27,4 +27,3 @@ DB_PATH = DATA_DIR / "fcontrol.db"
 
 # App constants
 CURRENCIES = ["PLN", "EUR", "USD"]
-DEFAULT_CURRENCY = "PLN"
