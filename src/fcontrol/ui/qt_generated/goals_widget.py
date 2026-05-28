@@ -184,7 +184,7 @@ class Ui_GoalsWidget(object):
         self.targetDateLabel.setText(QCoreApplication.translate("GoalsWidget", u"Target date", None))
         self.addButton.setText(QCoreApplication.translate("GoalsWidget", u"Add Goal", None))
         self.label_5.setText(QCoreApplication.translate("GoalsWidget", u"Description", None))
-        self.contributionsButton.setText(QCoreApplication.translate("GoalsWidget", u"Contributions", None))
+        self.contributionsButton.setText(QCoreApplication.translate("GoalsWidget", u"Movements", None))
         self.editButton.setText(QCoreApplication.translate("GoalsWidget", u"Edit", None))
         self.deleteButton.setText(QCoreApplication.translate("GoalsWidget", u"Delete", None))
     # retranslateUi

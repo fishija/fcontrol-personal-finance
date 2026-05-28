@@ -201,7 +201,7 @@
      <item>
       <widget class="QPushButton" name="contributionsButton">
        <property name="text">
-        <string>Contributions</string>
+        <string>Movements</string>
        </property>
       </widget>
      </item>

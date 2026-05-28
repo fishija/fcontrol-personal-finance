@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>GoalContributionsDialog</class>
- <widget class="QDialog" name="GoalContributionsDialog">
+ <class>GoalMovementsDialog</class>
+ <widget class="QDialog" name="GoalMovementsDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>520</width>
-    <height>400</height>
+    <width>560</width>
+    <height>480</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Goal Contributions</string>
+   <string>Goal Movements</string>
   </property>
   <layout class="QVBoxLayout" name="mainLayout">
    <property name="leftMargin">
@@ -37,12 +37,29 @@
     </widget>
    </item>
    <item>
-    <widget class="QListWidget" name="contributionsList">
+    <widget class="QLabel" name="pocketBalanceLabel">
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="availableBalanceLabel">
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QListWidget" name="movementsList">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
        <horstretch>0</horstretch>
        <verstretch>1</verstretch>
       </sizepolicy>
+     </property>
+     <property name="editTriggers">
+      <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
      </property>
     </widget>
    </item>
@@ -71,14 +88,58 @@
     </layout>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBox">
+    <widget class="QGroupBox" name="addGroupBox">
      <property name="title">
-      <string>Add Contribution</string>
+      <string>Add Movement</string>
      </property>
      <layout class="QVBoxLayout" name="addGroupLayout">
       <property name="spacing">
        <number>6</number>
       </property>
+      <item>
+       <layout class="QHBoxLayout" name="typeRow">
+        <property name="spacing">
+         <number>6</number>
+        </property>
+        <item>
+         <widget class="QLabel" name="label_type">
+          <property name="text">
+           <string>Type:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QRadioButton" name="contributionRadio">
+          <property name="text">
+           <string>Contribution</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QRadioButton" name="withdrawalRadio">
+          <property name="text">
+           <string>Withdrawal</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="typeRowSpacer">
+          <property name="orientation">
+           <enum>Qt::Orientation::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
       <item>
        <layout class="QHBoxLayout" name="addRow1">
         <property name="spacing">
@@ -171,7 +232,7 @@
          </spacer>
         </item>
         <item>
-         <widget class="QPushButton" name="addContributionButton">
+         <widget class="QPushButton" name="addButton">
           <property name="text">
            <string>Add</string>
           </property>

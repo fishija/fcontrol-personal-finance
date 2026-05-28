@@ -126,5 +126,36 @@ class GoalService:
         self.goal_contribution_repository.insert(contribution)
         return contribution
 
+    def add_withdrawal(
+        self,
+        goal_id: int,
+        amount: float,
+        date: datetime.date,
+        note: str = "",
+    ) -> GoalContribution:
+        if amount <= 0:
+            raise ValueError("Withdrawal amount must be greater than zero.")
+        goal = self.goal_repository.get_by_id(goal_id)
+        if goal is None:
+            raise ValueError("Goal not found.")
+        if amount > goal.current_amount:
+            raise ValueError("Withdrawal amount exceeds current goal balance.")
+        withdrawal = GoalContribution(
+            goal_id=goal_id,
+            amount=-amount,
+            date=date,
+            note=note,
+        )
+        self.goal_contribution_repository.insert(withdrawal)
+        return withdrawal
+
     def delete_contribution(self, contribution_id: int) -> None:
         self.goal_contribution_repository.delete(contribution_id)
+
+    def get_available_balance(self, goal: Goal) -> tuple[float, float]:
+        """Return (pocket_balance, available_for_contribution) for the goal's pocket."""
+        pockets = self.pocket_repository.get_all()
+        pocket = next((p for p in pockets if p.id == goal.pocket.id), None)
+        if pocket is None:
+            return 0.0, 0.0
+        return pocket.balance, pocket.balance - pocket.reserved_amount

@@ -1,6 +1,6 @@
 from PySide6.QtCore import QObject, Signal
 
-from fcontrol.ui import GoalsWidget, GoalEditDialog, GoalContributionsDialog
+from fcontrol.ui import GoalsWidget, GoalEditDialog, GoalMovementsDialog
 from fcontrol.services import GoalService
 
 
@@ -81,11 +81,17 @@ class GoalController(QObject):
 
         self._contributions_goal_id = goal_id
         contributions = self.service.get_contributions(goal_id)
-        self._contributions_dialog = GoalContributionsDialog(goal, contributions)
+        pocket_balance, available_balance = self.service.get_available_balance(goal)
+        self._contributions_dialog = GoalMovementsDialog(
+            goal, contributions, pocket_balance, available_balance
+        )
         self._contributions_dialog.add_contribution_request.connect(
             self._on_add_contribution
         )
-        self._contributions_dialog.delete_contribution_request.connect(
+        self._contributions_dialog.add_withdrawal_request.connect(
+            self._on_add_withdrawal
+        )
+        self._contributions_dialog.delete_movement_request.connect(
             self._on_delete_contribution
         )
         self._contributions_dialog.exec()
@@ -99,10 +105,27 @@ class GoalController(QObject):
             self.service.add_contribution(goal_id, amount, date, note)
             goal = self.service.get_goal_by_id(goal_id)
             contributions = self.service.get_contributions(goal_id)
-            self._contributions_dialog.populate(goal, contributions)
+            pocket_balance, available_balance = self.service.get_available_balance(goal)
+            self._contributions_dialog.populate(
+                goal, contributions, pocket_balance, available_balance
+            )
             self.goal_repo_changed.emit()
         except Exception as e:
             print(f"Unexpected error when adding contribution: {str(e)}")
+
+    def _on_add_withdrawal(self, amount: float, date, note: str):
+        goal_id = self._contributions_goal_id
+        try:
+            self.service.add_withdrawal(goal_id, amount, date, note)
+            goal = self.service.get_goal_by_id(goal_id)
+            contributions = self.service.get_contributions(goal_id)
+            pocket_balance, available_balance = self.service.get_available_balance(goal)
+            self._contributions_dialog.populate(
+                goal, contributions, pocket_balance, available_balance
+            )
+            self.goal_repo_changed.emit()
+        except Exception as e:
+            print(f"Unexpected error when adding withdrawal: {str(e)}")
 
     def _on_delete_contribution(self, contribution_id: int):
         goal_id = self._contributions_goal_id
@@ -110,7 +133,10 @@ class GoalController(QObject):
             self.service.delete_contribution(contribution_id)
             goal = self.service.get_goal_by_id(goal_id)
             contributions = self.service.get_contributions(goal_id)
-            self._contributions_dialog.populate(goal, contributions)
+            pocket_balance, available_balance = self.service.get_available_balance(goal)
+            self._contributions_dialog.populate(
+                goal, contributions, pocket_balance, available_balance
+            )
             self.goal_repo_changed.emit()
         except Exception as e:
             print(f"Unexpected error when removing contribution: {str(e)}")
