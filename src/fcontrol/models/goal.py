@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 import datetime
 
-from fcontrol.models import Pocket
+from fcontrol.models.pocket import Pocket
 
 
 @dataclass

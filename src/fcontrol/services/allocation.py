@@ -8,8 +8,13 @@ from fcontrol.models import (
     PocketRepository,
     AllocationRepository,
     TransactionCategoryRepository,
+    Goal,
+    GoalRepository,
+    GoalContribution,
+    GoalContributionRepository,
 )
 from currency_converter import CurrencyConverter
+import datetime
 
 
 class AllocationService:
@@ -19,11 +24,15 @@ class AllocationService:
         pocket_repository: PocketRepository,
         transaction_category_repository: TransactionCategoryRepository,
         currency_converter: CurrencyConverter,
+        goal_repository: GoalRepository | None = None,
+        goal_contribution_repository: GoalContributionRepository | None = None,
     ):
         self.pocket_repository = pocket_repository
         self.allocation_repository = allocation_repository
         self.transaction_category_repository = transaction_category_repository
         self.currency_converter = currency_converter
+        self.goal_repository = goal_repository
+        self.goal_contribution_repository = goal_contribution_repository
 
         self.calculated_results = []
 
@@ -36,18 +45,19 @@ class AllocationService:
         current_pocket_balance: float,
     ) -> tuple[float, float]:
         """Return allocated amount in pocket currency and in income currency"""
+        pocket = rule.target_pocket
 
         def convert_to_pocket_currency(amount: float) -> float:
-            if income_currency != rule.pocket.currency:
+            if income_currency != pocket.currency:
                 return self.currency_converter.convert(
-                    amount, income_currency, rule.pocket.currency
+                    amount, income_currency, pocket.currency
                 )
             return amount
 
         def convert_to_income_currency(amount: float) -> float:
-            if rule.pocket.currency != income_currency:
+            if pocket.currency != income_currency:
                 return self.currency_converter.convert(
-                    amount, rule.pocket.currency, income_currency
+                    amount, pocket.currency, income_currency
                 )
             return amount
 
@@ -111,6 +121,11 @@ class AllocationService:
     def get_pockets(self):
         return self.pocket_repository.get_all()
 
+    def get_goals(self) -> list[Goal]:
+        if self.goal_repository:
+            return self.goal_repository.get_all()
+        return []
+
     def get_income_categories(self):
         return self.transaction_category_repository.get_all()
 
@@ -149,19 +164,37 @@ class AllocationService:
         return None
 
     def add_rule(
-        self, pocket_id: int, allocation_type: str, value: float, position: int
+        self,
+        pocket_id: int | None,
+        goal_id: int | None,
+        allocation_type: str,
+        value: float,
+        position: int,
     ) -> str | None:
         error = self.validate_rule(allocation_type, value)
 
         if error:
             return error
 
-        pocket = self.pocket_repository.get_by_id(pocket_id)
-        if not pocket:
-            return f"Pocket with ID {pocket_id} not found."
+        if not pocket_id and not goal_id:
+            return "Select a pocket or a goal for the allocation rule."
+
+        pocket = None
+        goal = None
+
+        if pocket_id:
+            pocket = self.pocket_repository.get_by_id(pocket_id)
+            if not pocket:
+                return f"Pocket with ID {pocket_id} not found."
+
+        if goal_id and self.goal_repository:
+            goal = self.goal_repository.get_by_id(goal_id)
+            if not goal:
+                return f"Goal with ID {goal_id} not found."
 
         rule = AllocationRule(
             pocket=pocket,
+            goal=goal,
             allocation_type=AllocationType(allocation_type),
             value=value,
             position=position,
@@ -174,21 +207,39 @@ class AllocationService:
         return None
 
     def update_rule(
-        self, rule_id: int, pocket_id: int, allocation_type: str, value: float
+        self,
+        rule_id: int,
+        pocket_id: int | None,
+        goal_id: int | None,
+        allocation_type: str,
+        value: float,
     ) -> str | None:
         error = self.validate_rule(allocation_type, value)
         if error:
             return error
 
+        if not pocket_id and not goal_id:
+            return "Select a pocket or a goal for the allocation rule."
+
         rule = self.allocation_repository.get_by_id(rule_id)
         if not rule:
             raise ValueError(f"Allocation rule with ID {rule_id} not found.")
 
-        pocket = self.pocket_repository.get_by_id(pocket_id)
-        if not pocket:
-            raise ValueError(f"Pocket with ID {pocket_id} not found.")
+        pocket = None
+        goal = None
+
+        if pocket_id:
+            pocket = self.pocket_repository.get_by_id(pocket_id)
+            if not pocket:
+                raise ValueError(f"Pocket with ID {pocket_id} not found.")
+
+        if goal_id and self.goal_repository:
+            goal = self.goal_repository.get_by_id(goal_id)
+            if not goal:
+                raise ValueError(f"Goal with ID {goal_id} not found.")
 
         rule.pocket = pocket
+        rule.goal = goal
         rule.allocation_type = AllocationType(allocation_type)
         rule.value = value
         self.allocation_repository.update(rule)
@@ -218,18 +269,21 @@ class AllocationService:
         pocket_balances = {pocket.id: pocket.balance for pocket in pockets}
 
         for rule in rules:
-            pocket_id = rule.pocket.id
+            pocket = rule.target_pocket
+            pocket_id = pocket.id
 
             allocated_pocket, allocated_income = self._calculate_allocation(
                 rule,
                 income_value,
                 income_left,
                 income_currency,
-                pocket_balances[pocket_id],
+                pocket_balances.get(pocket_id, 0.0),
             )
             income_left -= allocated_income
 
-            pocket_balances[pocket_id] += allocated_pocket
+            pocket_balances[pocket_id] = (
+                pocket_balances.get(pocket_id, 0.0) + allocated_pocket
+            )
             results.append(
                 AllocationResult(
                     rule=rule,
@@ -260,7 +314,7 @@ class AllocationService:
                 transactions.append(
                     Transaction(
                         amount=abs(round(result.allocated_in_pocket_currency, 2)),
-                        pocket=result.rule.pocket,
+                        pocket=result.rule.target_pocket,
                         transaction_type=TransactionType.INCOME,
                         category=income_category,
                         source=TransactionSource.ALLOCATION,
@@ -268,3 +322,25 @@ class AllocationService:
                     )
                 )
         return transactions
+
+    def create_goal_contributions(self) -> list[GoalContribution]:
+        """Create goal contributions for allocation rules that target a goal."""
+        contributions = []
+        for result in self.calculated_results:
+            if result.rule.goal and result.allocated_in_pocket_currency > 0:
+                contribution = GoalContribution(
+                    goal_id=result.rule.goal.id,
+                    amount=round(result.allocated_in_pocket_currency, 2),
+                    date=datetime.date.today(),
+                    note="Income allocation",
+                )
+                contributions.append(contribution)
+        return contributions
+
+    def apply_goal_contributions(self) -> None:
+        """Persist goal contributions for goal-targeted allocation rules."""
+        if not self.goal_contribution_repository:
+            return
+        contributions = self.create_goal_contributions()
+        for contribution in contributions:
+            self.goal_contribution_repository.insert(contribution)

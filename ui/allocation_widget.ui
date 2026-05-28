@@ -114,7 +114,7 @@
      <rect>
       <x>20</x>
       <y>10</y>
-      <width>253</width>
+      <width>381</width>
       <height>97</height>
      </rect>
     </property>
@@ -145,9 +145,19 @@
         </widget>
        </item>
        <item>
+        <widget class="QLabel" name="label_9">
+         <property name="text">
+          <string>/</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QComboBox" name="goalSelect"/>
+       </item>
+       <item>
         <widget class="QLabel" name="label_4">
          <property name="text">
-          <string>pocket.</string>
+          <string>.</string>
          </property>
         </widget>
        </item>

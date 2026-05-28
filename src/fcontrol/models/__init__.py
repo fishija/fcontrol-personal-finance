@@ -1,4 +1,5 @@
 from .pocket import Pocket, PocketRepository
+from .goal import Goal, GoalRepository, GoalContribution, GoalContributionRepository
 from .allocation import (
     AllocationRule,
     AllocationType,
@@ -13,7 +14,6 @@ from .transaction import (
     TransactionCategoryRepository,
     TransactionRepository,
 )
-from .goal import Goal, GoalRepository, GoalContribution, GoalContributionRepository
 
 __all__ = [
     "Pocket",

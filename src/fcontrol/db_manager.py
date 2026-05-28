@@ -22,11 +22,13 @@ class DatabaseManager:
 
             CREATE TABLE IF NOT EXISTS allocation_rules (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                pocket_id INTEGER NOT NULL,
+                pocket_id INTEGER,
+                goal_id INTEGER,
                 allocation_type TEXT NOT NULL,
                 value REAL NOT NULL,
                 position INTEGER NOT NULL,
-                FOREIGN KEY (pocket_id) REFERENCES pockets(id) ON DELETE CASCADE
+                FOREIGN KEY (pocket_id) REFERENCES pockets(id) ON DELETE CASCADE,
+                FOREIGN KEY (goal_id) REFERENCES goals(id) ON DELETE CASCADE
             );
 
             CREATE TABLE IF NOT EXISTS categories (
@@ -68,12 +70,7 @@ class DatabaseManager:
         """)
 
     def _migrate_schema(self):
-        # Drop current_amount from goals — now computed from goal_contributions
-        try:
-            self.connection.execute("ALTER TABLE goals DROP COLUMN current_amount")
-            self.connection.commit()
-        except Exception:
-            pass  # Already dropped or never existed
+        pass
 
     def _add_initial_data(self):
         DEFAULT_CATEGORIES = [

@@ -50,7 +50,7 @@ class Ui_AllocationWidget(object):
         self.infoLabel.setGeometry(QRect(20, 110, 471, 16))
         self.layoutWidget = QWidget(self.groupBox)
         self.layoutWidget.setObjectName(u"layoutWidget")
-        self.layoutWidget.setGeometry(QRect(20, 10, 253, 97))
+        self.layoutWidget.setGeometry(QRect(20, 10, 381, 97))
         self.verticalLayout = QVBoxLayout(self.layoutWidget)
         self.verticalLayout.setSpacing(4)
         self.verticalLayout.setObjectName(u"verticalLayout")
@@ -72,6 +72,16 @@ class Ui_AllocationWidget(object):
         self.pocketSelect.setSizePolicy(sizePolicy)
 
         self.horizontalLayout_2.addWidget(self.pocketSelect)
+
+        self.label_9 = QLabel(self.layoutWidget)
+        self.label_9.setObjectName(u"label_9")
+
+        self.horizontalLayout_2.addWidget(self.label_9)
+
+        self.goalSelect = QComboBox(self.layoutWidget)
+        self.goalSelect.setObjectName(u"goalSelect")
+
+        self.horizontalLayout_2.addWidget(self.goalSelect)
 
         self.label_4 = QLabel(self.layoutWidget)
         self.label_4.setObjectName(u"label_4")
@@ -185,7 +195,8 @@ class Ui_AllocationWidget(object):
         self.addButton.setText(QCoreApplication.translate("AllocationWidget", u"Add Rule", None))
         self.infoLabel.setText(QCoreApplication.translate("AllocationWidget", u"TextLabel", None))
         self.label_3.setText(QCoreApplication.translate("AllocationWidget", u"Allocate to", None))
-        self.label_4.setText(QCoreApplication.translate("AllocationWidget", u"pocket.", None))
+        self.label_9.setText(QCoreApplication.translate("AllocationWidget", u"/", None))
+        self.label_4.setText(QCoreApplication.translate("AllocationWidget", u".", None))
         self.label_5.setText(QCoreApplication.translate("AllocationWidget", u"Allocate by", None))
         self.label_6.setText(QCoreApplication.translate("AllocationWidget", u".", None))
         self.label_8.setText(QCoreApplication.translate("AllocationWidget", u"Value to allocate:", None))

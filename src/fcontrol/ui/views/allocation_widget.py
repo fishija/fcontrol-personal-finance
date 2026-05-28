@@ -1,10 +1,17 @@
-from PySide6.QtWidgets import QTableWidget, QTableWidgetItem, QMessageBox
+from PySide6.QtWidgets import (
+    QTableWidget,
+    QTableWidgetItem,
+    QMessageBox,
+    QComboBox,
+    QSizePolicy,
+)
 from PySide6.QtCore import Signal, Qt
 
 from fcontrol.ui.views.base import BaseWidget, LabelState
 from fcontrol.ui.qt_generated.allocation_widget import Ui_AllocationWidget
 from fcontrol.models import (
     Pocket,
+    Goal,
     AllocationRule,
     AllocationType,
     AllocationResult,
@@ -15,8 +22,8 @@ from fcontrol.config import CURRENCIES
 
 class AllocationWidget(Ui_AllocationWidget, BaseWidget):
     add_request = Signal(
-        int, str, float, int
-    )  # pocket id, allocation type, value, position (row in the table)
+        object, object, str, float, int
+    )  # pocket_id (or None), goal_id (or None), allocation type, value, position
     delete_request = Signal(int)  # rule id
     edit_request = Signal(int)  # rule id
     move_up_request = Signal(int)  # rule id
@@ -57,7 +64,7 @@ class AllocationWidget(Ui_AllocationWidget, BaseWidget):
     def _setup_table(self):
         self.rulesTable.setColumnCount(4)
         self.rulesTable.setHorizontalHeaderLabels(
-            ["Pocket", "Rule", "To allocate", "New balance"]
+            ["Target", "Rule", "To allocate", "New balance"]
         )
 
         self.rulesTable.itemDoubleClicked.connect(self._on_double_clicked)
@@ -80,9 +87,30 @@ class AllocationWidget(Ui_AllocationWidget, BaseWidget):
 
         self.allocateButton.clicked.connect(self._on_allocate_clicked)
 
+        # Exclusive selection: pocket vs goal
+        self.pocketSelect.currentIndexChanged.connect(self._on_pocket_changed)
+        self.goalSelect.currentIndexChanged.connect(self._on_goal_changed)
+
+    def _on_pocket_changed(self):
+        """When a pocket is selected, disable goal selection."""
+        if self.pocketSelect.currentData() is not None:
+            self.goalSelect.setEnabled(False)
+        else:
+            self.goalSelect.setEnabled(True)
+
+    def _on_goal_changed(self):
+        """When a goal is selected, disable pocket selection."""
+        if self.goalSelect.currentData() is not None:
+            self.pocketSelect.setEnabled(False)
+        else:
+            self.pocketSelect.setEnabled(True)
+
     def _set_initial_state(self):
         # self.infoLabel.setText("")
         self.pocketSelect.setCurrentIndex(0)
+        self.pocketSelect.setEnabled(True)
+        self.goalSelect.setCurrentIndex(0)
+        self.goalSelect.setEnabled(True)
         self.allocationTypeSelect.setCurrentIndex(0)
         self.ruleValueInput.setValue(0.00)
         self.rulesTable.clearSelection()
@@ -104,14 +132,15 @@ class AllocationWidget(Ui_AllocationWidget, BaseWidget):
 
     def _on_add_clicked(self):
         pocket_id = self.pocketSelect.currentData()
+        goal_id = self.goalSelect.currentData()
         allocation_type = self.allocationTypeSelect.currentText()
         value = self.ruleValueInput.value()
 
         # Basic validation
-        if pocket_id is None:
+        if pocket_id is None and goal_id is None:
             self._set_label(
                 self.infoLabel,
-                "Please select a pocket for the allocation rule.",
+                "Please select a pocket or a goal for the allocation rule.",
                 LabelState.ERROR,
             )
             return
@@ -131,7 +160,7 @@ class AllocationWidget(Ui_AllocationWidget, BaseWidget):
             self._set_label(self.infoLabel, "")
 
         self.add_request.emit(
-            pocket_id, allocation_type, value, self.rulesTable.rowCount()
+            pocket_id, goal_id, allocation_type, value, self.rulesTable.rowCount()
         )
 
     def _on_delete_clicked(self):
@@ -176,6 +205,9 @@ class AllocationWidget(Ui_AllocationWidget, BaseWidget):
 
     def clear_new_rule_inputs(self):
         self.pocketSelect.setCurrentIndex(0)
+        self.pocketSelect.setEnabled(True)
+        self.goalSelect.setCurrentIndex(0)
+        self.goalSelect.setEnabled(True)
         self.allocationTypeSelect.setCurrentIndex(0)
         self.ruleValueInput.setValue(0.00)
 
@@ -189,9 +221,16 @@ class AllocationWidget(Ui_AllocationWidget, BaseWidget):
     def populate_pockets(self, pockets: list[Pocket]):
         self.pocketSelect.clear()
 
-        self.pocketSelect.addItem("Select", None)
+        self.pocketSelect.addItem("Select Pocket", None)
         for pocket in pockets:
             self.pocketSelect.addItem(f"{pocket.name} ({pocket.currency})", pocket.id)
+
+    def populate_goals(self, goals: list[Goal]):
+        self.goalSelect.clear()
+
+        self.goalSelect.addItem("Select Goal", None)
+        for goal in goals:
+            self.goalSelect.addItem(f"{goal.name} ({goal.pocket.currency})", goal.id)
 
     def populate_income_categories(self, categories: list[TransactionCategory]):
         self.incomeCategorySelect.clear()
@@ -215,7 +254,7 @@ class AllocationWidget(Ui_AllocationWidget, BaseWidget):
             self.rulesTable.setItem(
                 row,
                 0,
-                QTableWidgetItem(str(rule.pocket)),
+                QTableWidgetItem(rule.get_target_display()),
             )
             self.rulesTable.setItem(row, 1, rule_item)
             self.rulesTable.setItem(row, 2, QTableWidgetItem(""))  # allocated amount
@@ -247,5 +286,7 @@ class AllocationWidget(Ui_AllocationWidget, BaseWidget):
             self.rulesTable.setItem(
                 row,
                 3,
-                QTableWidgetItem(f"{new_balance_str} {result.rule.pocket.currency}"),
+                QTableWidgetItem(
+                    f"{new_balance_str} {result.rule.target_pocket.currency}"
+                ),
             )

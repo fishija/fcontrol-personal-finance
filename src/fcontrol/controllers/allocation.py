@@ -10,6 +10,7 @@ class AllocationController(QObject):
     apply_transactions_request = Signal(
         list, object
     )  # List of transactions to apply after allocation
+    goal_repo_changed = Signal()  # Emitted when goal contributions are created
 
     def __init__(
         self,
@@ -33,11 +34,11 @@ class AllocationController(QObject):
         self.view.allocate_request.connect(self._on_allocate_clicked)
 
     def _on_add_allocation_rule(
-        self, pocket_id: int, allocation_type: str, value: float, position: int
+        self, pocket_id, goal_id, allocation_type: str, value: float, position: int
     ):
         try:
             error = self.allocation_service.add_rule(
-                pocket_id, allocation_type, value, position
+                pocket_id, goal_id, allocation_type, value, position
             )
             if error:
                 self.view.set_info_message(error, LabelState.ERROR)
@@ -69,7 +70,8 @@ class AllocationController(QObject):
             return
 
         pockets = self.allocation_service.get_pockets()
-        dialog = AllocationRuleEditDialog(rule, pockets, AllocationType)
+        goals = self.allocation_service.get_goals()
+        dialog = AllocationRuleEditDialog(rule, pockets, AllocationType, goals)
         if not dialog.exec_():
             return
 
@@ -78,6 +80,7 @@ class AllocationController(QObject):
             error = self.allocation_service.update_rule(
                 rule_id,
                 new_values["pocket_id"],
+                new_values["goal_id"],
                 new_values["allocation_type"],
                 new_values["value"],
             )
@@ -162,6 +165,17 @@ class AllocationController(QObject):
 
     def on_allocation_performed(self, success: bool, message: str):
         if success:
+            # Apply goal contributions for goal-targeted rules
+            try:
+                self.allocation_service.apply_goal_contributions()
+                self.goal_repo_changed.emit()
+            except Exception as e:
+                self.view.set_info_message(
+                    f"Allocation done but goal contribution failed: {str(e)}",
+                    LabelState.ERROR,
+                )
+                return
+
             self.view.show_allocation_success_dialog(message)
             self.refresh_pockets()
             self.refresh_rules()
@@ -171,6 +185,10 @@ class AllocationController(QObject):
     def refresh_pockets(self):
         pockets = self.allocation_service.get_pockets()
         self.view.populate_pockets(pockets)
+
+    def refresh_goals(self):
+        goals = self.allocation_service.get_goals()
+        self.view.populate_goals(goals)
 
     def refresh_income_categories(self):
         categories = self.allocation_service.get_income_categories()
@@ -196,5 +214,6 @@ class AllocationController(QObject):
 
     def refresh(self):
         self.refresh_pockets()
+        self.refresh_goals()
         self.refresh_rules()
         self.refresh_income_categories()

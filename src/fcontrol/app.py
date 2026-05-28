@@ -9,6 +9,7 @@ from fcontrol.models import (
     TransactionRepository,
     TransactionCategoryRepository,
     GoalRepository,
+    GoalContributionRepository,
 )
 from fcontrol.services import (
     PocketService,
@@ -57,12 +58,13 @@ class Application:
 
     def _setup_repositories(self):
         self.pocket_repository = PocketRepository(self.db)
+        self.goal_repository = GoalRepository(self.db)
         self.allocation_repository = AllocationRepository(
-            self.db, self.pocket_repository
+            self.db, self.pocket_repository, self.goal_repository
         )
         self.transaction_repository = TransactionRepository(self.db)
         self.transaction_category_repository = TransactionCategoryRepository(self.db)
-        self.goal_repository = GoalRepository(self.db)
+        self.goal_contribution_repository = GoalContributionRepository(self.db)
 
     def _setup_views(self):
         self.home_widget = HomeWidget()
@@ -78,6 +80,8 @@ class Application:
             self.pocket_repository,
             self.transaction_category_repository,
             self.currency_converter,
+            self.goal_repository,
+            self.goal_contribution_repository,
         )
         self.transaction_service = TransactionService(
             self.transaction_repository,
@@ -87,6 +91,7 @@ class Application:
         self.goal_service = GoalService(
             self.goal_repository,
             self.pocket_repository,
+            self.goal_contribution_repository,
         )
 
     def _setup_controllers(self):
@@ -119,8 +124,19 @@ class Application:
             self.transaction_controller.apply_transactions
         )
 
+        # Connect allocation goal_repo_changed to refresh goal view
+        self.allocation_controller.goal_repo_changed.connect(
+            self.goal_controller.refresh
+        )
+
         # Connect category repo changed
         self.transaction_controller.category_repo_changed.connect(
+            self.allocation_controller.refresh
+        )
+
+        # Connections between controllers - goals
+        self.goal_controller.goal_repo_changed.connect(self.pocket_controller.refresh)
+        self.goal_controller.goal_repo_changed.connect(
             self.allocation_controller.refresh
         )
 
