@@ -151,9 +151,12 @@ class Application:
             self.transaction_controller.apply_transactions
         )
 
-        # Connect allocation goal_repo_changed to refresh goal view
+        # Connect allocation goal_repo_changed to refresh goal and pocket views
         self.allocation_controller.goal_repo_changed.connect(
             self.goal_controller.refresh
+        )
+        self.allocation_controller.goal_repo_changed.connect(
+            self.pocket_controller.refresh
         )
 
         # Connect category repo changed
