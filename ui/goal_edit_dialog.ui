@@ -6,188 +6,203 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>420</width>
+    <width>450</width>
     <height>300</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Edit Goal</string>
   </property>
-  <widget class="QLabel" name="label">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>14</y>
-     <width>100</width>
-     <height>16</height>
-    </rect>
+  <layout class="QVBoxLayout" name="mainLayout">
+   <property name="leftMargin">
+    <number>12</number>
    </property>
-   <property name="text">
-    <string>Name:</string>
+   <property name="topMargin">
+    <number>12</number>
    </property>
-  </widget>
-  <widget class="QLineEdit" name="nameInput">
-   <property name="geometry">
-    <rect>
-     <x>120</x>
-     <y>10</y>
-     <width>280</width>
-     <height>24</height>
-    </rect>
+   <property name="rightMargin">
+    <number>12</number>
    </property>
-  </widget>
-  <widget class="QLabel" name="label_2">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>50</y>
-     <width>100</width>
-     <height>16</height>
-    </rect>
+   <property name="bottomMargin">
+    <number>12</number>
    </property>
-   <property name="text">
-    <string>Pocket:</string>
+   <property name="spacing">
+    <number>10</number>
    </property>
-  </widget>
-  <widget class="QComboBox" name="pocketSelect">
-   <property name="geometry">
-    <rect>
-     <x>120</x>
-     <y>46</y>
-     <width>280</width>
-     <height>28</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_3">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>92</y>
-     <width>100</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Target Amount:</string>
-   </property>
-  </widget>
-  <widget class="QDoubleSpinBox" name="targetAmountInput">
-   <property name="geometry">
-    <rect>
-     <x>120</x>
-     <y>88</y>
-     <width>130</width>
-     <height>24</height>
-    </rect>
-   </property>
-   <property name="buttonSymbols">
-    <enum>QAbstractSpinBox::ButtonSymbols::NoButtons</enum>
-   </property>
-   <property name="maximum">
-    <double>1000000000.000000000000000</double>
-   </property>
-   <property name="decimals">
-    <number>2</number>
-   </property>
-  </widget>
-  <widget class="QCheckBox" name="setTargetDateInput">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>128</y>
-     <width>140</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Set Target Date</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="targetDateLabel">
-   <property name="geometry">
-    <rect>
-     <x>158</x>
-     <y>130</y>
-     <width>70</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Target date:</string>
-   </property>
-  </widget>
-  <widget class="QDateEdit" name="targetDateInput">
-   <property name="geometry">
-    <rect>
-     <x>236</x>
-     <y>126</y>
-     <width>120</width>
-     <height>24</height>
-    </rect>
-   </property>
-   <property name="buttonSymbols">
-    <enum>QAbstractSpinBox::ButtonSymbols::NoButtons</enum>
-   </property>
-   <property name="calendarPopup">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_4">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>164</y>
-     <width>100</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Description:</string>
-   </property>
-  </widget>
-  <widget class="QTextEdit" name="descriptionInput">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>184</y>
-     <width>390</width>
-     <height>60</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="cancelButton">
-   <property name="geometry">
-    <rect>
-     <x>200</x>
-     <y>258</y>
-     <width>100</width>
-     <height>32</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Cancel</string>
-   </property>
-   <property name="autoDefault">
-    <bool>false</bool>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="saveButton">
-   <property name="geometry">
-    <rect>
-     <x>310</x>
-     <y>258</y>
-     <width>100</width>
-     <height>32</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Save</string>
-   </property>
-   <property name="default">
-    <bool>true</bool>
-   </property>
-  </widget>
+   <item>
+    <layout class="QFormLayout" name="formLayout">
+     <property name="horizontalSpacing">
+      <number>12</number>
+     </property>
+     <property name="verticalSpacing">
+      <number>8</number>
+     </property>
+     <item row="0" column="0">
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>Name:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLineEdit" name="nameInput"/>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>Pocket:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QComboBox" name="pocketSelect"/>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="label_3">
+       <property name="text">
+        <string>Target Amount:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QDoubleSpinBox" name="targetAmountInput">
+       <property name="buttonSymbols">
+        <enum>QAbstractSpinBox::ButtonSymbols::NoButtons</enum>
+       </property>
+       <property name="maximum">
+        <double>1000000000.000000000000000</double>
+       </property>
+       <property name="decimals">
+        <number>2</number>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="QCheckBox" name="setTargetDateInput">
+       <property name="text">
+        <string>Set Target Date</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <layout class="QHBoxLayout" name="dateRow">
+       <property name="spacing">
+        <number>6</number>
+       </property>
+       <item>
+        <widget class="QLabel" name="targetDateLabel">
+         <property name="text">
+          <string>Target date:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QDateEdit" name="targetDateInput">
+         <property name="minimumSize">
+          <size>
+           <width>120</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="buttonSymbols">
+          <enum>QAbstractSpinBox::ButtonSymbols::NoButtons</enum>
+         </property>
+         <property name="calendarPopup">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="dateSpacer">
+         <property name="orientation">
+          <enum>Qt::Orientation::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </item>
+     <item row="4" column="0">
+      <widget class="QLabel" name="label_4">
+       <property name="text">
+        <string>Description:</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignTop</set>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1">
+      <widget class="QTextEdit" name="descriptionInput">
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>70</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Orientation::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>10</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="buttonsLayout">
+     <property name="spacing">
+      <number>6</number>
+     </property>
+     <item>
+      <spacer name="btnSpacer">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="cancelButton">
+       <property name="text">
+        <string>Cancel</string>
+       </property>
+       <property name="autoDefault">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="saveButton">
+       <property name="text">
+        <string>Save</string>
+       </property>
+       <property name="default">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
  </widget>
  <resources/>
  <connections/>

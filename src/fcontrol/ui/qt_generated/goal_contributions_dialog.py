@@ -16,57 +16,134 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QAbstractSpinBox, QApplication, QDateEdit, QDialog,
-    QDoubleSpinBox, QGroupBox, QLabel, QLineEdit,
-    QListWidget, QListWidgetItem, QPushButton, QSizePolicy,
-    QWidget)
+    QDoubleSpinBox, QGroupBox, QHBoxLayout, QLabel,
+    QLineEdit, QListWidget, QListWidgetItem, QPushButton,
+    QSizePolicy, QSpacerItem, QVBoxLayout, QWidget)
 
 class Ui_GoalContributionsDialog(object):
     def setupUi(self, GoalContributionsDialog):
         if not GoalContributionsDialog.objectName():
             GoalContributionsDialog.setObjectName(u"GoalContributionsDialog")
-        GoalContributionsDialog.resize(500, 370)
+        GoalContributionsDialog.resize(520, 400)
+        self.mainLayout = QVBoxLayout(GoalContributionsDialog)
+        self.mainLayout.setSpacing(10)
+        self.mainLayout.setObjectName(u"mainLayout")
+        self.mainLayout.setContentsMargins(12, 12, 12, 12)
         self.infoLabel = QLabel(GoalContributionsDialog)
         self.infoLabel.setObjectName(u"infoLabel")
-        self.infoLabel.setGeometry(QRect(10, 10, 480, 16))
+
+        self.mainLayout.addWidget(self.infoLabel)
+
         self.contributionsList = QListWidget(GoalContributionsDialog)
         self.contributionsList.setObjectName(u"contributionsList")
-        self.contributionsList.setGeometry(QRect(10, 34, 480, 160))
+        sizePolicy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(1)
+        sizePolicy.setHeightForWidth(self.contributionsList.sizePolicy().hasHeightForWidth())
+        self.contributionsList.setSizePolicy(sizePolicy)
+
+        self.mainLayout.addWidget(self.contributionsList)
+
+        self.removeLayout = QHBoxLayout()
+        self.removeLayout.setObjectName(u"removeLayout")
+        self.removeSpacer = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        self.removeLayout.addItem(self.removeSpacer)
+
         self.removeButton = QPushButton(GoalContributionsDialog)
         self.removeButton.setObjectName(u"removeButton")
-        self.removeButton.setGeometry(QRect(380, 202, 110, 30))
+
+        self.removeLayout.addWidget(self.removeButton)
+
+
+        self.mainLayout.addLayout(self.removeLayout)
+
         self.groupBox = QGroupBox(GoalContributionsDialog)
         self.groupBox.setObjectName(u"groupBox")
-        self.groupBox.setGeometry(QRect(10, 242, 480, 88))
+        self.addGroupLayout = QVBoxLayout(self.groupBox)
+        self.addGroupLayout.setSpacing(6)
+        self.addGroupLayout.setObjectName(u"addGroupLayout")
+        self.addRow1 = QHBoxLayout()
+        self.addRow1.setSpacing(6)
+        self.addRow1.setObjectName(u"addRow1")
         self.label_amount = QLabel(self.groupBox)
         self.label_amount.setObjectName(u"label_amount")
-        self.label_amount.setGeometry(QRect(10, 26, 60, 16))
+
+        self.addRow1.addWidget(self.label_amount)
+
         self.amountInput = QDoubleSpinBox(self.groupBox)
         self.amountInput.setObjectName(u"amountInput")
-        self.amountInput.setGeometry(QRect(75, 22, 110, 24))
+        self.amountInput.setMinimumSize(QSize(100, 0))
         self.amountInput.setButtonSymbols(QAbstractSpinBox.ButtonSymbols.NoButtons)
         self.amountInput.setMaximum(1000000000.000000000000000)
         self.amountInput.setDecimals(2)
+
+        self.addRow1.addWidget(self.amountInput)
+
         self.label_note = QLabel(self.groupBox)
         self.label_note.setObjectName(u"label_note")
-        self.label_note.setGeometry(QRect(200, 26, 40, 16))
+
+        self.addRow1.addWidget(self.label_note)
+
         self.noteInput = QLineEdit(self.groupBox)
         self.noteInput.setObjectName(u"noteInput")
-        self.noteInput.setGeometry(QRect(244, 22, 226, 24))
+        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+        sizePolicy1.setHorizontalStretch(1)
+        sizePolicy1.setVerticalStretch(0)
+        sizePolicy1.setHeightForWidth(self.noteInput.sizePolicy().hasHeightForWidth())
+        self.noteInput.setSizePolicy(sizePolicy1)
+
+        self.addRow1.addWidget(self.noteInput)
+
+
+        self.addGroupLayout.addLayout(self.addRow1)
+
+        self.addRow2 = QHBoxLayout()
+        self.addRow2.setSpacing(6)
+        self.addRow2.setObjectName(u"addRow2")
         self.label_date = QLabel(self.groupBox)
         self.label_date.setObjectName(u"label_date")
-        self.label_date.setGeometry(QRect(10, 60, 40, 16))
+
+        self.addRow2.addWidget(self.label_date)
+
         self.dateInput = QDateEdit(self.groupBox)
         self.dateInput.setObjectName(u"dateInput")
-        self.dateInput.setGeometry(QRect(55, 56, 120, 24))
+        self.dateInput.setMinimumSize(QSize(110, 0))
         self.dateInput.setButtonSymbols(QAbstractSpinBox.ButtonSymbols.NoButtons)
         self.dateInput.setCalendarPopup(True)
+
+        self.addRow2.addWidget(self.dateInput)
+
+        self.addRow2Spacer = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        self.addRow2.addItem(self.addRow2Spacer)
+
         self.addContributionButton = QPushButton(self.groupBox)
         self.addContributionButton.setObjectName(u"addContributionButton")
-        self.addContributionButton.setGeometry(QRect(380, 56, 90, 28))
+
+        self.addRow2.addWidget(self.addContributionButton)
+
+
+        self.addGroupLayout.addLayout(self.addRow2)
+
+
+        self.mainLayout.addWidget(self.groupBox)
+
+        self.closeLayout = QHBoxLayout()
+        self.closeLayout.setObjectName(u"closeLayout")
+        self.closeSpacer = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        self.closeLayout.addItem(self.closeSpacer)
+
         self.closeButton = QPushButton(GoalContributionsDialog)
         self.closeButton.setObjectName(u"closeButton")
-        self.closeButton.setGeometry(QRect(380, 338, 110, 32))
         self.closeButton.setAutoDefault(False)
+
+        self.closeLayout.addWidget(self.closeButton)
+
+
+        self.mainLayout.addLayout(self.closeLayout)
+
 
         self.retranslateUi(GoalContributionsDialog)
 
