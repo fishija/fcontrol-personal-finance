@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.13,<3.15"
 dependencies = [
     "currencyconverter>=0.18.17",
+    "plotly>=6.0",
     "platformdirs>=4.9.6",
     "pyside6>=6.10.1",
 ]
