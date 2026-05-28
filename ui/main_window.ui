@@ -63,6 +63,13 @@
         </widget>
        </item>
        <item>
+        <widget class="QPushButton" name="netWorthButton">
+         <property name="text">
+          <string>Net Worth</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <spacer name="verticalSpacer">
          <property name="orientation">
           <enum>Qt::Orientation::Vertical</enum>

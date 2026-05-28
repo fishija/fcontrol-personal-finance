@@ -10,18 +10,21 @@ from fcontrol.models import (
     TransactionCategoryRepository,
     GoalRepository,
     GoalContributionRepository,
+    NetWorthSnapshotRepository,
 )
 from fcontrol.services import (
     PocketService,
     AllocationService,
     TransactionService,
     GoalService,
+    NetWorthService,
 )
 from fcontrol.controllers import (
     PocketController,
     AllocationController,
     TransactionController,
     GoalController,
+    NetWorthController,
 )
 from fcontrol.ui import (
     MainWindow,
@@ -30,7 +33,9 @@ from fcontrol.ui import (
     PocketsWidget,
     TransactionsWidget,
     GoalsWidget,
+    NetWorthWidget,
 )
+from fcontrol.settings import AppSettings
 
 
 class Application:
@@ -41,6 +46,7 @@ class Application:
         self.qt_app.setApplicationVersion(APP_VERSION)
 
         self._setup_currency_converter()
+        self._setup_settings()
         self._setup_database()
         self._setup_repositories()
         self._setup_views()
@@ -51,6 +57,9 @@ class Application:
 
     def _setup_currency_converter(self):
         self.currency_converter = CurrencyConverter()
+
+    def _setup_settings(self):
+        self.settings = AppSettings()
 
     def _setup_database(self):
         self.db = DatabaseManager(DB_PATH)
@@ -65,6 +74,7 @@ class Application:
         self.transaction_repository = TransactionRepository(self.db)
         self.transaction_category_repository = TransactionCategoryRepository(self.db)
         self.goal_contribution_repository = GoalContributionRepository(self.db)
+        self.net_worth_snapshot_repository = NetWorthSnapshotRepository(self.db)
 
     def _setup_views(self):
         self.home_widget = HomeWidget()
@@ -72,6 +82,7 @@ class Application:
         self.pockets_widget = PocketsWidget()
         self.transactions_widget = TransactionsWidget()
         self.goals_widget = GoalsWidget()
+        self.net_worth_widget = NetWorthWidget()
 
     def _setup_services(self):
         self.pocket_service = PocketService(self.pocket_repository)
@@ -93,6 +104,11 @@ class Application:
             self.pocket_repository,
             self.goal_contribution_repository,
         )
+        self.net_worth_service = NetWorthService(
+            self.net_worth_snapshot_repository,
+            self.pocket_repository,
+            self.currency_converter,
+        )
 
     def _setup_controllers(self):
         self.pocket_controller = PocketController(
@@ -105,6 +121,9 @@ class Application:
             self.transactions_widget, self.transaction_service
         )
         self.goal_controller = GoalController(self.goals_widget, self.goal_service)
+        self.net_worth_controller = NetWorthController(
+            self.net_worth_widget, self.net_worth_service
+        )
 
     def _setup_controller_connections(self):
         # Connections between controllers - pocket
@@ -151,6 +170,14 @@ class Application:
             self.goal_controller.refresh
         )
 
+        # Connections between controllers - net worth
+        self.pocket_controller.pocket_repo_changed.connect(
+            self.net_worth_controller.refresh
+        )
+        self.transaction_controller.transaction_repo_changed.connect(
+            self.net_worth_controller.refresh
+        )
+
     def _setup_main_window(self):
         self.main_window = MainWindow(
             home_widget=self.home_widget,
@@ -158,6 +185,7 @@ class Application:
             pockets_widget=self.pockets_widget,
             transactions_widget=self.transactions_widget,
             goals_widget=self.goals_widget,
+            net_worth_widget=self.net_worth_widget,
         )
         self.main_window.setWindowTitle(f"{APP_NAME} {APP_VERSION}")
 

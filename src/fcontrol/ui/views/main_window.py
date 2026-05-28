@@ -11,6 +11,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         pockets_widget,
         transactions_widget,
         goals_widget,
+        net_worth_widget,
     ):
         super().__init__()
         self.setupUi(self)
@@ -22,6 +23,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             pockets_widget,
             transactions_widget,
             goals_widget,
+            net_worth_widget,
         )
         self._setup_stacked_widget()
         self._setup_navigation_buttons()
@@ -33,6 +35,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         pockets_widget,
         transactions_widget,
         goals_widget,
+        net_worth_widget,
     ):
         self.nav_map = {
             0: (self.homeButton, home_widget),
@@ -40,6 +43,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             2: (self.pocketsButton, pockets_widget),
             3: (self.transactionsButton, transactions_widget),
             4: (self.goalsButton, goals_widget),
+            5: (self.netWorthButton, net_worth_widget),
         }
 
     def _setup_stacked_widget(self):

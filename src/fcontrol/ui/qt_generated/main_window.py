@@ -60,6 +60,11 @@ class Ui_MainWindow(object):
 
         self.verticalLayout.addWidget(self.goalsButton)
 
+        self.netWorthButton = QPushButton(self.frame)
+        self.netWorthButton.setObjectName(u"netWorthButton")
+
+        self.verticalLayout.addWidget(self.netWorthButton)
+
         self.verticalSpacer = QSpacerItem(20, 366, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
         self.verticalLayout.addItem(self.verticalSpacer)
@@ -93,5 +98,6 @@ class Ui_MainWindow(object):
         self.pocketsButton.setText(QCoreApplication.translate("MainWindow", u"Pockets", None))
         self.transactionsButton.setText(QCoreApplication.translate("MainWindow", u"Transactions", None))
         self.goalsButton.setText(QCoreApplication.translate("MainWindow", u"Goals", None))
+        self.netWorthButton.setText(QCoreApplication.translate("MainWindow", u"Net Worth", None))
     # retranslateUi
 
