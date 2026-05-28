@@ -3,6 +3,7 @@ from .allocation import AllocationController
 from .transaction import TransactionController
 from .goal import GoalController
 from .net_worth import NetWorthController
+from .settings import SettingsController
 
 __all__ = [
     "PocketController",
@@ -10,4 +11,5 @@ __all__ = [
     "TransactionController",
     "GoalController",
     "NetWorthController",
+    "SettingsController",
 ]

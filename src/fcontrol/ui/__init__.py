@@ -11,6 +11,7 @@ from .views import (
     GoalContributionsDialog,
     NetWorthWidget,
     NetWorthEditDialog,
+    SettingsWidget,
 )
 
 __all__ = [
@@ -26,4 +27,5 @@ __all__ = [
     "GoalContributionsDialog",
     "NetWorthWidget",
     "NetWorthEditDialog",
+    "SettingsWidget",
 ]

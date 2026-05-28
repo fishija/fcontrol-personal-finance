@@ -25,6 +25,7 @@ from fcontrol.controllers import (
     TransactionController,
     GoalController,
     NetWorthController,
+    SettingsController,
 )
 from fcontrol.ui import (
     MainWindow,
@@ -34,6 +35,7 @@ from fcontrol.ui import (
     TransactionsWidget,
     GoalsWidget,
     NetWorthWidget,
+    SettingsWidget,
 )
 from fcontrol.settings import AppSettings
 
@@ -53,6 +55,7 @@ class Application:
         self._setup_services()
         self._setup_controllers()
         self._setup_controller_connections()
+        self._apply_default_currency()
         self._setup_main_window()
 
     def _setup_currency_converter(self):
@@ -83,6 +86,7 @@ class Application:
         self.transactions_widget = TransactionsWidget()
         self.goals_widget = GoalsWidget()
         self.net_worth_widget = NetWorthWidget()
+        self.settings_widget = SettingsWidget()
 
     def _setup_services(self):
         self.pocket_service = PocketService(self.pocket_repository)
@@ -108,6 +112,7 @@ class Application:
             self.net_worth_snapshot_repository,
             self.pocket_repository,
             self.currency_converter,
+            self.settings,
         )
 
     def _setup_controllers(self):
@@ -123,6 +128,9 @@ class Application:
         self.goal_controller = GoalController(self.goals_widget, self.goal_service)
         self.net_worth_controller = NetWorthController(
             self.net_worth_widget, self.net_worth_service
+        )
+        self.settings_controller = SettingsController(
+            self.settings_widget, self.settings, self.net_worth_service
         )
 
     def _setup_controller_connections(self):
@@ -178,6 +186,22 @@ class Application:
             self.net_worth_controller.refresh
         )
 
+        # Connections between controllers - settings
+        self.settings_controller.default_currency_changed.connect(
+            self.net_worth_controller.refresh
+        )
+        self.settings_controller.default_currency_changed.connect(
+            self.pockets_widget.set_default_currency
+        )
+        self.settings_controller.default_currency_changed.connect(
+            self.allocation_widget.set_default_currency
+        )
+
+    def _apply_default_currency(self):
+        currency = self.settings.get_default_currency()
+        self.pockets_widget.set_default_currency(currency)
+        self.allocation_widget.set_default_currency(currency)
+
     def _setup_main_window(self):
         self.main_window = MainWindow(
             home_widget=self.home_widget,
@@ -186,6 +210,7 @@ class Application:
             transactions_widget=self.transactions_widget,
             goals_widget=self.goals_widget,
             net_worth_widget=self.net_worth_widget,
+            settings_widget=self.settings_widget,
         )
         self.main_window.setWindowTitle(f"{APP_NAME} {APP_VERSION}")
 

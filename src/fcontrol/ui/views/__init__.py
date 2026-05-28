@@ -10,6 +10,7 @@ from .goal_edit_dialog import GoalEditDialog
 from .goal_contributions_dialog import GoalContributionsDialog
 from .net_worth_widget import NetWorthWidget
 from .net_worth_edit_dialog import NetWorthEditDialog
+from .settings_widget import SettingsWidget
 
 __all__ = [
     "MainWindow",
@@ -24,4 +25,5 @@ __all__ = [
     "GoalContributionsDialog",
     "NetWorthWidget",
     "NetWorthEditDialog",
+    "SettingsWidget",
 ]
