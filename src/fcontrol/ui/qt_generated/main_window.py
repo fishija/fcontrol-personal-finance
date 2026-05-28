@@ -69,6 +69,11 @@ class Ui_MainWindow(object):
 
         self.verticalLayout.addItem(self.verticalSpacer)
 
+        self.settingsButton = QPushButton(self.frame)
+        self.settingsButton.setObjectName(u"settingsButton")
+
+        self.verticalLayout.addWidget(self.settingsButton)
+
 
         self.horizontalLayout.addWidget(self.frame)
 
@@ -99,5 +104,6 @@ class Ui_MainWindow(object):
         self.transactionsButton.setText(QCoreApplication.translate("MainWindow", u"Transactions", None))
         self.goalsButton.setText(QCoreApplication.translate("MainWindow", u"Goals", None))
         self.netWorthButton.setText(QCoreApplication.translate("MainWindow", u"Net Worth", None))
+        self.settingsButton.setText(QCoreApplication.translate("MainWindow", u"Settings", None))
     # retranslateUi
 
