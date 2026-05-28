@@ -8,6 +8,8 @@ from .allocation_rule_edit_dialog import AllocationRuleEditDialog
 from .goals_widget import GoalsWidget
 from .goal_edit_dialog import GoalEditDialog
 from .goal_contributions_dialog import GoalContributionsDialog
+from .net_worth_widget import NetWorthWidget
+from .net_worth_edit_dialog import NetWorthEditDialog
 
 __all__ = [
     "MainWindow",
@@ -20,4 +22,6 @@ __all__ = [
     "GoalsWidget",
     "GoalEditDialog",
     "GoalContributionsDialog",
+    "NetWorthWidget",
+    "NetWorthEditDialog",
 ]
