@@ -36,6 +36,9 @@ class PocketsWidget(Ui_PocketsWidget, BaseWidget):
         self.deleteButton.setEnabled(False)
         self.editButton.setEnabled(False)
 
+    def set_default_currency(self, currency: str):
+        self.currencySelect.setCurrentText(currency)
+
     def _setup_table(self):
         self.pocketsTable.setColumnCount(4)
         self.pocketsTable.setHorizontalHeaderLabels(

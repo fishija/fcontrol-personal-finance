@@ -61,6 +61,9 @@ class AllocationWidget(Ui_AllocationWidget, BaseWidget):
         self.upButton.setEnabled(False)
         self.downButton.setEnabled(False)
 
+    def set_default_currency(self, currency: str):
+        self.currencySelect.setCurrentText(currency)
+
     def _setup_table(self):
         self.rulesTable.setColumnCount(4)
         self.rulesTable.setHorizontalHeaderLabels(
