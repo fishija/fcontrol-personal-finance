@@ -1,9 +1,8 @@
 from PySide6.QtWidgets import (
     QTableWidget,
     QTableWidgetItem,
+    QHeaderView,
     QMessageBox,
-    QComboBox,
-    QSizePolicy,
 )
 from PySide6.QtCore import Signal, Qt
 
@@ -69,6 +68,13 @@ class AllocationWidget(Ui_AllocationWidget, BaseWidget):
         self.rulesTable.setHorizontalHeaderLabels(
             ["Target", "Rule", "To allocate", "New balance"]
         )
+
+        header = self.rulesTable.horizontalHeader()
+        header.setStretchLastSection(True)
+        header.setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
+        header.setSectionResizeMode(1, QHeaderView.ResizeMode.ResizeToContents)
+        header.setSectionResizeMode(2, QHeaderView.ResizeMode.ResizeToContents)
+        header.setSectionResizeMode(3, QHeaderView.ResizeMode.ResizeToContents)
 
         self.rulesTable.itemDoubleClicked.connect(self._on_double_clicked)
 
