@@ -1,6 +1,5 @@
 from PySide6.QtCore import QObject
 
-from fcontrol.config import DEFAULT_CURRENCY
 from fcontrol.ui.views.base import LabelState
 from fcontrol.ui.views.net_worth_widget import NetWorthWidget
 from fcontrol.ui.views.net_worth_edit_dialog import NetWorthEditDialog
@@ -24,8 +23,9 @@ class NetWorthController(QObject):
     def _on_take_snapshot(self, note: str):
         try:
             snapshot = self.service.take_snapshot(note)
+            currency = self.service.get_default_currency()
             self.view.set_info_message(
-                f"Snapshot taken: {snapshot.amount:.2f} {DEFAULT_CURRENCY}",
+                f"Snapshot taken: {snapshot.amount:.2f} {currency}",
                 LabelState.SUCCESS,
             )
             self.view.noteInput.clear()
@@ -60,5 +60,6 @@ class NetWorthController(QObject):
 
     def refresh(self):
         snapshots = self.service.get_snapshots()
+        currency = self.service.get_default_currency()
         self.view.populate_table(snapshots)
-        self.view.populate_chart(snapshots)
+        self.view.populate_chart(snapshots, currency)

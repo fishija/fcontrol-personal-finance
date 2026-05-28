@@ -7,7 +7,6 @@ import plotly.graph_objects as go
 from fcontrol.ui.views.base import BaseWidget, LabelState
 from fcontrol.ui.qt_generated.net_worth_widget import Ui_NetWorthWidget
 from fcontrol.models.net_worth import NetWorthSnapshot
-from fcontrol.config import DEFAULT_CURRENCY
 
 
 class NetWorthWidget(Ui_NetWorthWidget, BaseWidget):
@@ -111,7 +110,7 @@ class NetWorthWidget(Ui_NetWorthWidget, BaseWidget):
             )
             self.snapshotsTable.setItem(row, 2, QTableWidgetItem(snapshot.note))
 
-    def populate_chart(self, snapshots: list[NetWorthSnapshot]):
+    def populate_chart(self, snapshots: list[NetWorthSnapshot], currency: str = "PLN"):
         if not snapshots:
             self.web_view.setHtml("")
             return
@@ -121,7 +120,7 @@ class NetWorthWidget(Ui_NetWorthWidget, BaseWidget):
 
         fig = go.Figure(data=[go.Bar(x=dates, y=amounts, name="Net Worth")])
         fig.update_layout(
-            yaxis_title=f"Net Worth ({DEFAULT_CURRENCY})",
+            yaxis_title=f"Net Worth ({currency})",
             margin=dict(l=50, r=20, t=20, b=40),
             plot_bgcolor="white",
             paper_bgcolor="white",

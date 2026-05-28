@@ -2,9 +2,9 @@ from datetime import date
 
 from currency_converter import CurrencyConverter
 
-from fcontrol.config import DEFAULT_CURRENCY
 from fcontrol.models import PocketRepository
 from fcontrol.models.net_worth import NetWorthSnapshot, NetWorthSnapshotRepository
+from fcontrol.settings import AppSettings
 
 
 class NetWorthService:
@@ -13,24 +13,30 @@ class NetWorthService:
         snapshot_repository: NetWorthSnapshotRepository,
         pocket_repository: PocketRepository,
         currency_converter: CurrencyConverter,
+        settings: AppSettings,
     ):
         self.snapshot_repository = snapshot_repository
         self.pocket_repository = pocket_repository
         self.currency_converter = currency_converter
+        self.settings = settings
+
+    def get_default_currency(self) -> str:
+        return self.settings.get_default_currency()
 
     def get_snapshots(self) -> list[NetWorthSnapshot]:
         return self.snapshot_repository.get_all()
 
     def take_snapshot(self, note: str = "") -> NetWorthSnapshot:
+        currency = self.settings.get_default_currency()
         pockets = self.pocket_repository.get_all()
 
         total = 0.0
         for pocket in pockets:
-            if pocket.currency == DEFAULT_CURRENCY:
+            if pocket.currency == currency:
                 total += pocket.balance
             else:
                 converted = self.currency_converter.convert(
-                    pocket.balance, pocket.currency, DEFAULT_CURRENCY
+                    pocket.balance, pocket.currency, currency
                 )
                 total += converted
 
@@ -40,6 +46,17 @@ class NetWorthService:
             note=note,
         )
         return self.snapshot_repository.insert(snapshot)
+
+    def recalculate_snapshots(self, old_currency: str, new_currency: str) -> None:
+        """Convert all snapshot amounts from old_currency to new_currency using historical rates."""
+        snapshots = self.snapshot_repository.get_all()
+        for snapshot in snapshots:
+            snapshot_date = date.fromisoformat(snapshot.date)
+            converted = self.currency_converter.convert(
+                snapshot.amount, old_currency, new_currency, date=snapshot_date
+            )
+            snapshot.amount = round(converted, 2)
+            self.snapshot_repository.update(snapshot)
 
     def update_snapshot(
         self, snapshot_id: int, amount: float, snapshot_date: str, note: str
