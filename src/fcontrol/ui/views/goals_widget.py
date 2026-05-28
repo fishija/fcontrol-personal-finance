@@ -42,7 +42,7 @@ class GoalsWidget(Ui_GoalsWidget, BaseWidget):
     def _connect_signals(self):
         self.setTargetDateInput.stateChanged.connect(self._on_set_target_date_changed)
         self.listWidget.itemSelectionChanged.connect(self._on_list_selection_changed)
-        self.listWidget.itemDoubleClicked.connect(self._on_edit_clicked)
+        self.listWidget.itemDoubleClicked.connect(self._on_contributions_clicked)
         self.addButton.clicked.connect(self._on_add_clicked)
         self.editButton.clicked.connect(self._on_edit_clicked)
         self.deleteButton.clicked.connect(self._on_delete_clicked)
@@ -116,9 +116,14 @@ class GoalsWidget(Ui_GoalsWidget, BaseWidget):
     def populate_goal_list(self, goals):
         self.listWidget.clear()
         for goal in goals:
-            item_text = f"{goal.name} - Target: {goal.target_amount:.2f}"
+            item_text = (
+                f"{goal.name}"
+                f"  |  Pocket: {goal.pocket.name} ({goal.pocket.currency})"
+                f"  |  {goal.current_amount:.2f} / {goal.target_amount:.2f} {goal.pocket.currency}"
+                f"  ({goal.progress_percentage}%)"
+            )
             if goal.target_date:
-                item_text += f" by {goal.target_date.strftime('%Y-%m-%d')}"
+                item_text += f"  |  by {goal.target_date.strftime('%d.%m.%Y')}"
             item = self.create_list_item(item_text, data=goal.id)
             self.listWidget.addItem(item)
 
