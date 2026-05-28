@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QTableWidget, QTableWidgetItem
+from PySide6.QtWidgets import QTableWidget, QTableWidgetItem, QHeaderView
 from PySide6.QtCore import Qt, Signal
 
 from fcontrol.ui.views.base import BaseWidget, LabelState
@@ -44,6 +44,13 @@ class PocketsWidget(Ui_PocketsWidget, BaseWidget):
         self.pocketsTable.setHorizontalHeaderLabels(
             ["Name", "Balance", "Reserved", "Currency"]
         )
+
+        header = self.pocketsTable.horizontalHeader()
+        header.setStretchLastSection(True)
+        header.setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
+        header.setSectionResizeMode(1, QHeaderView.ResizeMode.ResizeToContents)
+        header.setSectionResizeMode(2, QHeaderView.ResizeMode.ResizeToContents)
+        header.setSectionResizeMode(3, QHeaderView.ResizeMode.ResizeToContents)
 
         self.pocketsTable.setSelectionMode(QTableWidget.SelectionMode.SingleSelection)
         self.pocketsTable.setSelectionBehavior(
