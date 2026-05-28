@@ -67,6 +67,13 @@ class DatabaseManager:
                 note TEXT NOT NULL DEFAULT '',
                 FOREIGN KEY (goal_id) REFERENCES goals(id) ON DELETE CASCADE
             );
+
+            CREATE TABLE IF NOT EXISTS net_worth_snapshots (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                amount REAL NOT NULL,
+                date TEXT NOT NULL,
+                note TEXT NOT NULL DEFAULT ''
+            );
         """)
 
     def _migrate_schema(self):

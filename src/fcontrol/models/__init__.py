@@ -14,6 +14,7 @@ from .transaction import (
     TransactionCategoryRepository,
     TransactionRepository,
 )
+from .net_worth import NetWorthSnapshot, NetWorthSnapshotRepository
 
 __all__ = [
     "Pocket",
@@ -32,4 +33,6 @@ __all__ = [
     "GoalRepository",
     "GoalContribution",
     "GoalContributionRepository",
+    "NetWorthSnapshot",
+    "NetWorthSnapshotRepository",
 ]
