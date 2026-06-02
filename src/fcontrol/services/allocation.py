@@ -43,6 +43,7 @@ class AllocationService:
         income_left: float,
         income_currency: str,
         current_pocket_balance: float,
+        current_goal_balance: float = 0.0,
     ) -> tuple[float, float]:
         """Return allocated amount in pocket currency and in income currency"""
         pocket = rule.target_pocket
@@ -83,7 +84,11 @@ class AllocationService:
             return allocated_in_pocket_currency, allocated_in_income_currency
 
         elif rule.allocation_type == AllocationType.TARGET_BALANCE:
-            current_balance = current_pocket_balance
+            current_balance = (
+                current_goal_balance
+                if rule.goal is not None
+                else current_pocket_balance
+            )
             if current_balance >= rule.value:
                 return 0.0, 0.0
 
@@ -268,9 +273,13 @@ class AllocationService:
         rules = self.allocation_repository.get_all()
         pocket_balances = {pocket.id: pocket.balance for pocket in pockets}
 
+        goals = self.goal_repository.get_all() if self.goal_repository else []
+        goal_balances = {goal.id: goal.current_amount for goal in goals}
+
         for rule in rules:
             pocket = rule.target_pocket
             pocket_id = pocket.id
+            goal_id = rule.goal.id if rule.goal else None
 
             allocated_pocket, allocated_income = self._calculate_allocation(
                 rule,
@@ -278,12 +287,17 @@ class AllocationService:
                 income_left,
                 income_currency,
                 pocket_balances.get(pocket_id, 0.0),
+                goal_balances.get(goal_id, 0.0) if goal_id is not None else 0.0,
             )
             income_left -= allocated_income
 
             pocket_balances[pocket_id] = (
                 pocket_balances.get(pocket_id, 0.0) + allocated_pocket
             )
+            if goal_id is not None:
+                goal_balances[goal_id] = (
+                    goal_balances.get(goal_id, 0.0) + allocated_pocket
+                )
             results.append(
                 AllocationResult(
                     rule=rule,

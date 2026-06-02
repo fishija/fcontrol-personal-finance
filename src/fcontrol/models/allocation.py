@@ -11,7 +11,7 @@ from fcontrol.db_manager import DatabaseManager
 class AllocationType(enum.Enum):
     AMOUNT = r"amount of income"
     PERCENTAGE = r"% of income"
-    TARGET_BALANCE = r"target balance of pocket"
+    TARGET_BALANCE = r"target balance of pocket/goal"
 
 
 @dataclass
@@ -57,7 +57,7 @@ class AllocationRule:
     def get_target_display(self) -> str:
         """Display string for the allocation target (pocket or goal)."""
         if self.goal:
-            return f"[Goal] {self.goal.name}"
+            return f"[Goal] {self.goal.name} ({self.goal.progress_percentage:.1f}%)"
         return str(self.pocket)
 
 
