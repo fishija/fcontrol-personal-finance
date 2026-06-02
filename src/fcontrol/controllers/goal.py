@@ -62,6 +62,7 @@ class GoalController(QObject):
                 new_values["description"],
             )
             self.refresh()
+            self.goal_repo_changed.emit()
         except Exception as e:
             print(f"Unexpected error when updating goal: {str(e)}")
 

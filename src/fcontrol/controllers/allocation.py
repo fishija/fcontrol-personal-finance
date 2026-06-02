@@ -176,9 +176,9 @@ class AllocationController(QObject):
                 )
                 return
 
-            self.view.show_allocation_success_dialog(message)
             self.refresh_pockets()
             self.refresh_rules()
+            self.view.show_allocation_success_dialog(message)
         else:
             self.view.set_info_message(message, LabelState.ERROR)
 
