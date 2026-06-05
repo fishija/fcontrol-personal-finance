@@ -69,8 +69,12 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         # Set buttons inside group to be exclusive
         self.nav_button_group.setExclusive(True)
 
-        # Set default checked button
-        self.homeButton.setChecked(True)
+        # Set default checked button # TODO: change to homeButton when home page is implemented
+        self.allocationButton.setChecked(True)
+        self.stackedWidget.setCurrentIndex(1)  # Show allocation page by default
+        self.homeButton.setEnabled(False)  # Disable home button until home page is implemented
+
+        # self.homeButton.setChecked(True)
 
         # Connect button group signal to change stacked widget page
         self.nav_button_group.idClicked.connect(self._on_nav_button_clicked)
