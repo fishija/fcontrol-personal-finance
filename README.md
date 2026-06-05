@@ -6,7 +6,7 @@ Personal finance control application. Python 3.13, PySide6 (Qt6), SQLite.
 
 - **Transaction-based** — every balance change is a tracked transaction
 - **Rule-based income allocation** — income is distributed across pockets via ordered rules (fixed amount, percentage, or target balance)
-- **Goal contributions** — goals don't hold money; they track contributions reserved within a pocket
+- **Goal movements** — goals don't hold money; they track contributions and withdrawals reserved within a pocket
 - **Net worth tracking** — periodic snapshots of total balance across all pockets, converted to a single currency
 - **Configurable default currency** — persisted via QSettings; changing it recalculates historical net worth snapshots using date-specific exchange rates
 
@@ -19,7 +19,7 @@ Pocket
 ├── has many → Transactions
 ├── has many → Allocation Rules (ordered)
 └── has many → Goals
-    └── has many → Goal Contributions (amount, date, note)
+    └── has many → Goal Movements (contribution or withdrawal, amount, date, note)
 
 Net Worth Snapshot
 ├── amount (in default currency)
@@ -32,8 +32,8 @@ Net Worth Snapshot
 | **Pocket** | A container for money (bank account, cash, card). Holds balance and currency. |
 | **Transaction** | Income or expense against a pocket. Tracks source (manual, allocation, adjustment). |
 | **Allocation Rule** | Defines how income is split: fixed amount, % of income, or target balance. Ordered by position. |
-| **Goal** | A savings target within a pocket. Progress computed from contributions. |
-| **Goal Contribution** | A recorded amount saved toward a goal. Sum = pocket's reserved amount. |
+| **Goal** | A savings target within a pocket. Progress computed from movements. |
+| **Goal Movement** | A contribution (+) or withdrawal (−) against a goal. Net sum = pocket's reserved amount. |
 | **Net Worth Snapshot** | A point-in-time total of all pocket balances converted to the default currency. |
 
 ## Architecture
@@ -55,7 +55,7 @@ config.py     → constants (supported currencies)
 - **Pockets** — create, edit, delete money containers with per-pocket currency
 - **Transactions** — record income/expenses with categories, dates, descriptions
 - **Allocation** — define ordered rules to split income across pockets/goals; run allocation in one click
-- **Goals** — set savings targets with optional target dates; track progress via contributions
+- **Goals** — set savings targets with optional target dates; track progress via contributions and withdrawals; movements dialog shows pocket balance and available-for-contribution amount
 - **Net Worth** — take snapshots, view history in a plotly bar chart, edit/delete past entries
 - **Settings** — change default currency with automatic historical recalculation of net worth snapshots
 
