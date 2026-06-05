@@ -5,7 +5,9 @@ a = Analysis(
     ['src/fcontrol/main.py'],
     pathex=['src'],
     binaries=[],
-    datas=[],
+    datas=[
+        ('.venv/lib/python3.13/site-packages/currency_converter/eurofxref-hist.zip', 'currency_converter'),
+    ],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},

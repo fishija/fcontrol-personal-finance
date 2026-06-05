@@ -1,11 +1,15 @@
-from importlib.metadata import version
+from importlib.metadata import version, PackageNotFoundError
 from platformdirs import user_data_dir
 from pathlib import Path
 import sys
 
 APP_NAME = "FControl"
 APP_AUTHOR = "fishija"
-APP_VERSION = version(APP_NAME)
+
+try:
+    APP_VERSION = version(APP_NAME)
+except PackageNotFoundError:
+    APP_VERSION = "0.1.0"
 
 # Detect environment
 IS_FROZEN = getattr(sys, "frozen", False)
