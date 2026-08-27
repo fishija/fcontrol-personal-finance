@@ -27,7 +27,7 @@ DATA_DIR = Path(user_data_dir(APP_NAME, APP_AUTHOR))
 DATA_DIR.mkdir(parents=True, exist_ok=True)
 
 # Database
-DB_PATH = DATA_DIR / "fcontrol_dev.db"
+DB_PATH = DATA_DIR / "fcontrol.db"
 
 # App constants
 CURRENCIES = ["PLN", "EUR", "USD"]
