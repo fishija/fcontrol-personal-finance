@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 import datetime
+from decimal import Decimal
 
 from fcontrol.models.pocket import Pocket
 
@@ -7,13 +8,13 @@ from fcontrol.models.pocket import Pocket
 @dataclass
 class Goal:
     name: str
-    target_amount: float
+    target_amount: Decimal
     pocket: Pocket
     target_date: datetime.date | None = None
     description: str = ""
     id: int | None = None
     # Computed from goal_contributions — never written to the DB
-    current_amount: float = 0.0
+    current_amount: Decimal = Decimal(0)
 
     @property
     def progress_percentage(self) -> int:
@@ -25,7 +26,7 @@ class Goal:
 @dataclass
 class GoalContribution:
     goal_id: int
-    amount: float
+    amount: Decimal
     date: datetime.date
     note: str = ""
     id: int | None = None
@@ -55,8 +56,8 @@ class GoalRepository:
             goal = Goal(
                 id=r["id"],
                 name=r["name"],
-                target_amount=r["target_amount"],
-                current_amount=r["current_amount"],
+                target_amount=Decimal(str(r["target_amount"])),
+                current_amount=Decimal(str(r["current_amount"])),
                 target_date=(
                     datetime.datetime.strptime(r["target_date"], "%Y-%m-%d").date()
                     if r["target_date"]
@@ -126,8 +127,8 @@ class GoalRepository:
         return Goal(
             id=row["id"],
             name=row["name"],
-            target_amount=row["target_amount"],
-            current_amount=row["current_amount"],
+            target_amount=Decimal(str(row["target_amount"])),
+            current_amount=Decimal(str(row["current_amount"])),
             target_date=(
                 datetime.datetime.strptime(row["target_date"], "%Y-%m-%d").date()
                 if row["target_date"]
@@ -159,7 +160,7 @@ class GoalContributionRepository:
             GoalContribution(
                 id=r["id"],
                 goal_id=r["goal_id"],
-                amount=r["amount"],
+                amount=Decimal(str(r["amount"])),
                 date=datetime.datetime.strptime(r["date"], "%Y-%m-%d").date(),
                 note=r["note"] or "",
             )

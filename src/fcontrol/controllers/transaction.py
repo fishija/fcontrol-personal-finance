@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from PySide6.QtCore import QObject, Signal
 
 from fcontrol.models import Transaction, TransactionType, TransactionSource
@@ -62,7 +64,7 @@ class TransactionController(QObject):
     ):
         try:
             self.service.add_transaction(
-                amount=amount,
+                amount=Decimal(str(amount)),
                 pocket_id=pocket_id,
                 transaction_type=transaction_type,
                 source=source,

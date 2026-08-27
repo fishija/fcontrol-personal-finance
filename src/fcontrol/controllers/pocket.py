@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from PySide6.QtCore import QObject, Signal
 
 from fcontrol.ui.views.base import LabelState
@@ -28,7 +30,7 @@ class PocketController(QObject):
     def _on_add(self, name: str, balance: float, currency: str):
         try:
             add_transaction = self.service.create_add_transaction(
-                name, balance, currency
+                name, Decimal(str(balance)), currency
             )
         except Exception as e:
             self.view.set_info_message(
@@ -54,7 +56,7 @@ class PocketController(QObject):
             update_transaction = self.service.create_update_transaction(
                 pocket,
                 new_values["name"],
-                new_values["balance"],
+                Decimal(str(new_values["balance"])),
                 new_values["currency"],
             )
         except Exception as e:

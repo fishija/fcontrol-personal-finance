@@ -1,4 +1,6 @@
 from dataclasses import dataclass
+from decimal import Decimal
+
 from fcontrol.db_manager import DatabaseManager
 
 
@@ -6,16 +8,16 @@ from fcontrol.db_manager import DatabaseManager
 class Pocket:
     name: str
     currency: str
-    balance: float = 0.0
+    balance: Decimal = Decimal(0)
     id: int | None = None
     # TODO: (idea) add "type" field to distinguish between cash, card, investment accounts, etc.
     # Computed from goal_contributions — never written to the DB
-    reserved_amount: float = 0.0
+    reserved_amount: Decimal = Decimal(0)
 
     def __str__(self):
         balance_str = (
             f"{int(self.balance)}"
-            if self.balance.is_integer()
+            if self.balance % 1 == 0
             else f"{self.balance:.2f}"
         )
         return f"{self.name} ({balance_str} {self.currency})"
@@ -41,9 +43,9 @@ class PocketRepository:
             Pocket(
                 id=r["id"],
                 name=r["name"],
-                balance=r["balance"],
+                balance=Decimal(str(r["balance"])),
                 currency=r["currency"],
-                reserved_amount=r["reserved_amount"],
+                reserved_amount=Decimal(str(r["reserved_amount"])),
             )
             for r in rows
         ]
@@ -56,7 +58,7 @@ class PocketRepository:
             return Pocket(
                 id=row["id"],
                 name=row["name"],
-                balance=row["balance"],
+                balance=Decimal(str(row["balance"])),
                 currency=row["currency"],
             )
         return None

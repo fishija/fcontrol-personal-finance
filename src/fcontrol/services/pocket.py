@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from fcontrol.models import (
     PocketRepository,
     Pocket,
@@ -15,7 +17,7 @@ class PocketService:
         self.pocket_repository = pocket_repository
 
     def validate_pocket_data(
-        self, name: str, balance: float, currency: str
+        self, name: str, balance: Decimal, currency: str
     ) -> str | None:
         if not name.strip():
             return "Pocket name cannot be empty."
@@ -30,7 +32,7 @@ class PocketService:
         return self.pocket_repository.get_by_id(pocket_id)
 
     def create_add_transaction(
-        self, name: str, balance: float, currency: str
+        self, name: str, balance: Decimal, currency: str
     ) -> Transaction:
         error = self.validate_pocket_data(name, balance, currency)
         if error:
@@ -53,7 +55,7 @@ class PocketService:
         return initial_transaction
 
     def create_update_transaction(
-        self, pocket: Pocket, name: str, balance: float, currency: str
+        self, pocket: Pocket, name: str, balance: Decimal, currency: str
     ) -> Transaction:
         error = self.validate_pocket_data(name, balance, currency)
         if error:

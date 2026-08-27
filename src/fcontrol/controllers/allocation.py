@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from PySide6.QtCore import QObject, Signal
 
 from fcontrol.ui.views.base import LabelState
@@ -38,7 +40,7 @@ class AllocationController(QObject):
     ):
         try:
             error = self.allocation_service.add_rule(
-                pocket_id, goal_id, allocation_type, value, position
+                pocket_id, goal_id, allocation_type, Decimal(str(value)), position
             )
             if error:
                 self.view.set_info_message(error, LabelState.ERROR)
@@ -82,7 +84,7 @@ class AllocationController(QObject):
                 new_values["pocket_id"],
                 new_values["goal_id"],
                 new_values["allocation_type"],
-                new_values["value"],
+                Decimal(str(new_values["value"])),
             )
             if error:
                 self.view.set_info_message(error, LabelState.ERROR)
@@ -123,7 +125,7 @@ class AllocationController(QObject):
     def _set_allocation_message(self, results: list[AllocationResult]):
         income_value, income_currency = self.view.get_income_data()
         validation_msg = self.allocation_service.validate_allocation_results(
-            income_value, income_currency, results
+            Decimal(str(income_value)), income_currency, results
         )
 
         if validation_msg:
@@ -203,7 +205,7 @@ class AllocationController(QObject):
 
         # Recalculate allocation after refreshing rules
         allocation_results = self.allocation_service.calculate_allocations(
-            income_input_value, income_currency
+            Decimal(str(income_input_value)), income_currency
         )
 
         # Update the view with new allocation results

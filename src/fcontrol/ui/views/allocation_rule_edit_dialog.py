@@ -77,7 +77,7 @@ class AllocationRuleEditDialog(Ui_AllocationRuleEditDialog, BaseDialog):
         self.allocationTypeSelect.setCurrentText(
             self.allocation_rule.allocation_type.value
         )
-        self.ruleValueInput.setValue(self.allocation_rule.value)
+        self.ruleValueInput.setValue(float(self.allocation_rule.value))
 
     def _connect_signals(self):
         self.saveButton.clicked.connect(self._on_save_clicked)

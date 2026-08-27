@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from PySide6.QtCore import QSettings
 
 
@@ -8,11 +10,11 @@ class AppSettings:
     def __init__(self):
         self._s = QSettings()
 
-    def get_last_income(self) -> float:
-        return self._s.value(self.LAST_INCOME, 0.0, type=float)
+    def get_last_income(self) -> Decimal:
+        return Decimal(str(self._s.value(self.LAST_INCOME, 0.0, type=float)))
 
-    def set_last_income(self, value: float):
-        self._s.setValue(self.LAST_INCOME, value)
+    def set_last_income(self, value: Decimal):
+        self._s.setValue(self.LAST_INCOME, float(value))
 
     def get_default_currency(self) -> str:
         return self._s.value(self.DEFAULT_CURRENCY, "PLN", type=str)

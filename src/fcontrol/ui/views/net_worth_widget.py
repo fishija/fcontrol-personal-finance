@@ -116,7 +116,7 @@ class NetWorthWidget(Ui_NetWorthWidget, BaseWidget):
             return
 
         dates = [s.date for s in snapshots]
-        amounts = [s.amount for s in snapshots]
+        amounts = [float(s.amount) for s in snapshots]
 
         fig = go.Figure(data=[go.Bar(x=dates, y=amounts, name="Net Worth")])
         fig.update_layout(

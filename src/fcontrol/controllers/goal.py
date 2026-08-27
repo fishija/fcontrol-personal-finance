@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from PySide6.QtCore import QObject, Signal
 
 from fcontrol.ui import GoalsWidget, GoalEditDialog, GoalMovementsDialog
@@ -33,7 +35,7 @@ class GoalController(QObject):
     ):
         try:
             self.service.add_goal(
-                name, pocket_id, target_amount, target_date, description
+                name, pocket_id, Decimal(str(target_amount)), target_date, description
             )
             self.refresh()
             self.goal_repo_changed.emit()
@@ -57,7 +59,7 @@ class GoalController(QObject):
                 goal,
                 new_values["name"],
                 new_values["pocket_id"],
-                new_values["target_amount"],
+                Decimal(str(new_values["target_amount"])),
                 new_values["target_date"],
                 new_values["description"],
             )
@@ -103,7 +105,7 @@ class GoalController(QObject):
     def _on_add_contribution(self, amount: float, date, note: str):
         goal_id = self._contributions_goal_id
         try:
-            self.service.add_contribution(goal_id, amount, date, note)
+            self.service.add_contribution(goal_id, Decimal(str(amount)), date, note)
             goal = self.service.get_goal_by_id(goal_id)
             contributions = self.service.get_contributions(goal_id)
             pocket_balance, available_balance = self.service.get_available_balance(goal)
@@ -117,7 +119,7 @@ class GoalController(QObject):
     def _on_add_withdrawal(self, amount: float, date, note: str):
         goal_id = self._contributions_goal_id
         try:
-            self.service.add_withdrawal(goal_id, amount, date, note)
+            self.service.add_withdrawal(goal_id, Decimal(str(amount)), date, note)
             goal = self.service.get_goal_by_id(goal_id)
             contributions = self.service.get_contributions(goal_id)
             pocket_balance, available_balance = self.service.get_available_balance(goal)

@@ -289,7 +289,7 @@ class AllocationWidget(Ui_AllocationWidget, BaseWidget):
             new_balance = result.new_balance_in_pocket_currency
             new_balance_str = (
                 f"{int(new_balance)}"
-                if new_balance.is_integer()
+                if new_balance % 1 == 0
                 else f"{new_balance:.2f}"
             )
             self.rulesTable.setItem(

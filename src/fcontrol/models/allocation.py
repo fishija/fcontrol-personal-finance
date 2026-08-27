@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from decimal import Decimal
 import enum
 
 from fcontrol.models.pocket import Pocket, PocketRepository
@@ -17,17 +18,17 @@ class AllocationType(enum.Enum):
 @dataclass
 class AllocationResult:
     rule: "AllocationRule"
-    allocated_in_pocket_currency: float
-    allocated_in_income_currency: float
-    new_balance_in_pocket_currency: float
-    income_left_after_allocation: float | None = None
+    allocated_in_pocket_currency: Decimal
+    allocated_in_income_currency: Decimal
+    new_balance_in_pocket_currency: Decimal
+    income_left_after_allocation: Decimal | None = None
 
 
 # TODO: add possibility to instead of value, give "all remaining from income"
 @dataclass
 class AllocationRule:
     allocation_type: AllocationType
-    value: float
+    value: Decimal
     pocket: Pocket | None = None
     goal: Goal | None = None
     position: int = 0
@@ -83,7 +84,7 @@ class AllocationRepository:
             pocket=pocket,
             goal=goal,
             allocation_type=AllocationType(row["allocation_type"]),
-            value=row["value"],
+            value=Decimal(str(row["value"])),
             position=row["position"],
             id=row["id"],
         )

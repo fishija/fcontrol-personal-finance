@@ -26,7 +26,7 @@ class NetWorthEditDialog(BaseDialog):
         self.amountInput.setMinimum(-1_000_000_000)
         self.amountInput.setMaximum(1_000_000_000)
         self.amountInput.setDecimals(2)
-        self.amountInput.setValue(snapshot.amount)
+        self.amountInput.setValue(float(snapshot.amount))
         form.addRow("Amount:", self.amountInput)
 
         self.dateInput = QDateEdit()

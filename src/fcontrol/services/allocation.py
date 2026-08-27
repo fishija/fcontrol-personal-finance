@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from fcontrol.models import (
     AllocationRule,
     AllocationResult,
@@ -15,6 +17,8 @@ from fcontrol.models import (
 )
 from currency_converter import CurrencyConverter
 import datetime
+
+_CENTS = Decimal("0.01")
 
 
 class AllocationService:
@@ -39,27 +43,27 @@ class AllocationService:
     def _calculate_allocation(
         self,
         rule: AllocationRule,
-        income_value: float,
-        income_left: float,
+        income_value: Decimal,
+        income_left: Decimal,
         income_currency: str,
-        current_pocket_balance: float,
-        current_goal_balance: float = 0.0,
-    ) -> tuple[float, float]:
+        current_pocket_balance: Decimal,
+        current_goal_balance: Decimal = Decimal(0),
+    ) -> tuple[Decimal, Decimal]:
         """Return allocated amount in pocket currency and in income currency"""
         pocket = rule.target_pocket
 
-        def convert_to_pocket_currency(amount: float) -> float:
+        def convert_to_pocket_currency(amount: Decimal) -> Decimal:
             if income_currency != pocket.currency:
-                return self.currency_converter.convert(
-                    amount, income_currency, pocket.currency
-                )
+                return Decimal(str(self.currency_converter.convert(
+                    float(amount), income_currency, pocket.currency
+                )))
             return amount
 
-        def convert_to_income_currency(amount: float) -> float:
+        def convert_to_income_currency(amount: Decimal) -> Decimal:
             if pocket.currency != income_currency:
-                return self.currency_converter.convert(
-                    amount, pocket.currency, income_currency
-                )
+                return Decimal(str(self.currency_converter.convert(
+                    float(amount), pocket.currency, income_currency
+                )))
             return amount
 
         income_in_pocket_currency = convert_to_pocket_currency(income_value)
@@ -90,7 +94,7 @@ class AllocationService:
                 else current_pocket_balance
             )
             if current_balance >= rule.value:
-                return 0.0, 0.0
+                return Decimal(0), Decimal(0)
 
             needed_in_pocket_currency = rule.value - current_balance
             allocated_in_pocket_currency = min(
@@ -137,7 +141,7 @@ class AllocationService:
     def get_allocation_rules(self):
         return self.allocation_repository.get_all()
 
-    def validate_rule(self, allocation_type: str, value: float) -> str | None:
+    def validate_rule(self, allocation_type: str, value: Decimal) -> str | None:
         try:
             allocation_type_enum = AllocationType(allocation_type)
         except ValueError:
@@ -154,7 +158,7 @@ class AllocationService:
         return None
 
     def validate_allocation_results(
-        self, income_value: float, income_currency: str, results: list[AllocationResult]
+        self, income_value: Decimal, income_currency: str, results: list[AllocationResult]
     ) -> str | None:
         if income_value == 0:
             return "Enter an income value to allocate."
@@ -173,7 +177,7 @@ class AllocationService:
         pocket_id: int | None,
         goal_id: int | None,
         allocation_type: str,
-        value: float,
+        value: Decimal,
         position: int,
     ) -> str | None:
         error = self.validate_rule(allocation_type, value)
@@ -217,7 +221,7 @@ class AllocationService:
         pocket_id: int | None,
         goal_id: int | None,
         allocation_type: str,
-        value: float,
+        value: Decimal,
     ) -> str | None:
         error = self.validate_rule(allocation_type, value)
         if error:
@@ -263,7 +267,7 @@ class AllocationService:
         return self.allocation_repository.get_by_position(position)
 
     def calculate_allocations(
-        self, income_value: float, income_currency: str
+        self, income_value: Decimal, income_currency: str
     ) -> list[AllocationResult]:
         results = []
         income_left = income_value
@@ -286,17 +290,17 @@ class AllocationService:
                 income_value,
                 income_left,
                 income_currency,
-                pocket_balances.get(pocket_id, 0.0),
-                goal_balances.get(goal_id, 0.0) if goal_id is not None else 0.0,
+                pocket_balances.get(pocket_id, Decimal(0)),
+                goal_balances.get(goal_id, Decimal(0)) if goal_id is not None else Decimal(0),
             )
             income_left -= allocated_income
 
             pocket_balances[pocket_id] = (
-                pocket_balances.get(pocket_id, 0.0) + allocated_pocket
+                pocket_balances.get(pocket_id, Decimal(0)) + allocated_pocket
             )
             if goal_id is not None:
                 goal_balances[goal_id] = (
-                    goal_balances.get(goal_id, 0.0) + allocated_pocket
+                    goal_balances.get(goal_id, Decimal(0)) + allocated_pocket
                 )
             results.append(
                 AllocationResult(
@@ -327,7 +331,7 @@ class AllocationService:
             if result.allocated_in_pocket_currency > 0:
                 transactions.append(
                     Transaction(
-                        amount=abs(round(result.allocated_in_pocket_currency, 2)),
+                        amount=abs(result.allocated_in_pocket_currency.quantize(_CENTS)),
                         pocket=result.rule.target_pocket,
                         transaction_type=TransactionType.INCOME,
                         category=income_category,
@@ -344,7 +348,7 @@ class AllocationService:
             if result.rule.goal and result.allocated_in_pocket_currency > 0:
                 contribution = GoalContribution(
                     goal_id=result.rule.goal.id,
-                    amount=round(result.allocated_in_pocket_currency, 2),
+                    amount=result.allocated_in_pocket_currency.quantize(_CENTS),
                     date=datetime.date.today(),
                     note="Income allocation",
                 )

@@ -28,7 +28,7 @@ class GoalEditDialog(Ui_GoalEditDialog, BaseDialog):
     def _populate(self, goal):
         self.nameInput.setText(goal.name)
         self.pocketSelect.setCurrentText(f"{goal.pocket.name} ({goal.pocket.currency})")
-        self.targetAmountInput.setValue(goal.target_amount)
+        self.targetAmountInput.setValue(float(goal.target_amount))
         self.descriptionInput.setPlainText(goal.description)
 
         if goal.target_date:

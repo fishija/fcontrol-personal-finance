@@ -1,10 +1,13 @@
 from datetime import date
+from decimal import Decimal
 
 from currency_converter import CurrencyConverter
 
 from fcontrol.models import PocketRepository
 from fcontrol.models.net_worth import NetWorthSnapshot, NetWorthSnapshotRepository
 from fcontrol.settings import AppSettings
+
+_CENTS = Decimal("0.01")
 
 
 class NetWorthService:
@@ -30,18 +33,18 @@ class NetWorthService:
         currency = self.settings.get_default_currency()
         pockets = self.pocket_repository.get_all()
 
-        total = 0.0
+        total = Decimal(0)
         for pocket in pockets:
             if pocket.currency == currency:
                 total += pocket.balance
             else:
-                converted = self.currency_converter.convert(
-                    pocket.balance, pocket.currency, currency
-                )
+                converted = Decimal(str(self.currency_converter.convert(
+                    float(pocket.balance), pocket.currency, currency
+                )))
                 total += converted
 
         snapshot = NetWorthSnapshot(
-            amount=round(total, 2),
+            amount=total.quantize(_CENTS),
             date=date.today().isoformat(),
             note=note,
         )
@@ -52,14 +55,14 @@ class NetWorthService:
         snapshots = self.snapshot_repository.get_all()
         for snapshot in snapshots:
             snapshot_date = date.fromisoformat(snapshot.date)
-            converted = self.currency_converter.convert(
-                snapshot.amount, old_currency, new_currency, date=snapshot_date
-            )
-            snapshot.amount = round(converted, 2)
+            converted = Decimal(str(self.currency_converter.convert(
+                float(snapshot.amount), old_currency, new_currency, date=snapshot_date
+            )))
+            snapshot.amount = converted.quantize(_CENTS)
             self.snapshot_repository.update(snapshot)
 
     def update_snapshot(
-        self, snapshot_id: int, amount: float, snapshot_date: str, note: str
+        self, snapshot_id: int, amount: Decimal, snapshot_date: str, note: str
     ) -> None:
         error = self.validate_snapshot_data(amount, snapshot_date)
         if error:
@@ -77,7 +80,7 @@ class NetWorthService:
     def delete_snapshot(self, snapshot_id: int) -> None:
         self.snapshot_repository.delete(snapshot_id)
 
-    def validate_snapshot_data(self, amount: float, snapshot_date: str) -> str | None:
+    def validate_snapshot_data(self, amount: Decimal, snapshot_date: str) -> str | None:
         if not snapshot_date.strip():
             return "Date cannot be empty."
         try:

@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from PySide6.QtCore import QObject
 
 from fcontrol.ui.views.base import LabelState
@@ -46,7 +48,7 @@ class NetWorthController(QObject):
         values = dialog.get_values()
         try:
             self.service.update_snapshot(
-                snapshot_id, values["amount"], values["date"], values["note"]
+                snapshot_id, Decimal(str(values["amount"])), values["date"], values["note"]
             )
             self.view.set_info_message("Snapshot updated.", LabelState.SUCCESS)
             self.refresh()

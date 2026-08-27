@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 import datetime
+from decimal import Decimal
 from enum import Enum
 
 from fcontrol.models import Pocket
@@ -26,7 +27,7 @@ class TransactionCategory:
 
 @dataclass
 class Transaction:
-    amount: float
+    amount: Decimal
     pocket: Pocket
     transaction_type: TransactionType
     date: datetime.date = field(default_factory=datetime.date.today)
@@ -40,7 +41,7 @@ class Transaction:
         return self.pocket.currency
 
     @property
-    def signed_amount(self) -> float:
+    def signed_amount(self) -> Decimal:
         return (
             self.amount
             if self.transaction_type == TransactionType.INCOME
@@ -115,7 +116,7 @@ class TransactionRepository:
             )
             transaction = Transaction(
                 id=r["id"],
-                amount=r["amount"],
+                amount=Decimal(str(r["amount"])),
                 date=datetime.datetime.strptime(r["date"], "%Y-%m-%d").date(),
                 description=r["description"],
                 transaction_type=TransactionType(r["transaction_type"]),
@@ -152,7 +153,7 @@ class TransactionRepository:
             )
             return Transaction(
                 id=row["id"],
-                amount=row["amount"],
+                amount=Decimal(str(row["amount"])),
                 date=datetime.datetime.strptime(row["date"], "%Y-%m-%d").date(),
                 description=row["description"],
                 transaction_type=TransactionType(row["transaction_type"]),

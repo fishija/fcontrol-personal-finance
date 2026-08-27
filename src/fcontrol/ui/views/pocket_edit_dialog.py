@@ -30,7 +30,7 @@ class PocketEditDialog(Ui_PocketEditDialog, BaseDialog):
 
         # Populate new input fields (right side) with current values as placeholders
         self.nameInput.setText(pocket.name)
-        self.balanceInput.setValue(pocket.balance)
+        self.balanceInput.setValue(float(pocket.balance))
         self.currencySelect.setCurrentText(pocket.currency)
 
     def _connect_signals(self):

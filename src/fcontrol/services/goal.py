@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from fcontrol.models import (
     Goal,
     GoalRepository,
@@ -25,7 +27,7 @@ class GoalService:
         self,
         name: str,
         pocket_id: int,
-        target_amount: float,
+        target_amount: Decimal,
         target_date: datetime.date | None,
         description: str,
     ) -> str | None:
@@ -50,7 +52,7 @@ class GoalService:
         self,
         name: str,
         pocket_id: int,
-        target_amount: float,
+        target_amount: Decimal,
         target_date: datetime.date | None,
         description: str,
     ) -> Goal:
@@ -82,7 +84,7 @@ class GoalService:
         goal: Goal,
         name: str,
         pocket_id: int,
-        target_amount: float,
+        target_amount: Decimal,
         target_date: datetime.date | None,
         description: str,
     ) -> Goal:
@@ -111,7 +113,7 @@ class GoalService:
     def add_contribution(
         self,
         goal_id: int,
-        amount: float,
+        amount: Decimal,
         date: datetime.date,
         note: str = "",
     ) -> GoalContribution:
@@ -129,7 +131,7 @@ class GoalService:
     def add_withdrawal(
         self,
         goal_id: int,
-        amount: float,
+        amount: Decimal,
         date: datetime.date,
         note: str = "",
     ) -> GoalContribution:
@@ -152,10 +154,10 @@ class GoalService:
     def delete_contribution(self, contribution_id: int) -> None:
         self.goal_contribution_repository.delete(contribution_id)
 
-    def get_available_balance(self, goal: Goal) -> tuple[float, float]:
+    def get_available_balance(self, goal: Goal) -> tuple[Decimal, Decimal]:
         """Return (pocket_balance, available_for_contribution) for the goal's pocket."""
         pockets = self.pocket_repository.get_all()
         pocket = next((p for p in pockets if p.id == goal.pocket.id), None)
         if pocket is None:
-            return 0.0, 0.0
+            return Decimal(0), Decimal(0)
         return pocket.balance, pocket.balance - pocket.reserved_amount

@@ -1,9 +1,16 @@
 import sqlite3
+from decimal import Decimal
+
+sqlite3.register_adapter(Decimal, str)
+
+sqlite3.register_converter(
+    "DECIMAL", lambda b: Decimal(b.decode("utf-8"))
+)
 
 
 class DatabaseManager:
     def __init__(self, db_path: str):
-        self.connection = sqlite3.connect(db_path)
+        self.connection = sqlite3.connect(db_path, detect_types=sqlite3.PARSE_DECLTYPES)
         self.connection.row_factory = sqlite3.Row
         self._init_schema()
         self._migrate_schema()
@@ -16,7 +23,7 @@ class DatabaseManager:
             CREATE TABLE IF NOT EXISTS pockets (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT NOT NULL,
-                balance REAL NOT NULL,
+                balance DECIMAL NOT NULL,
                 currency TEXT NOT NULL
             );
 
@@ -25,7 +32,7 @@ class DatabaseManager:
                 pocket_id INTEGER,
                 goal_id INTEGER,
                 allocation_type TEXT NOT NULL,
-                value REAL NOT NULL,
+                value DECIMAL NOT NULL,
                 position INTEGER NOT NULL,
                 FOREIGN KEY (pocket_id) REFERENCES pockets(id) ON DELETE CASCADE,
                 FOREIGN KEY (goal_id) REFERENCES goals(id) ON DELETE CASCADE
@@ -38,7 +45,7 @@ class DatabaseManager:
 
             CREATE TABLE IF NOT EXISTS transactions (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                amount REAL NOT NULL,
+                amount DECIMAL NOT NULL,
                 pocket_id INTEGER NOT NULL,
                 transaction_type TEXT NOT NULL,
                 date TEXT NOT NULL,
@@ -52,7 +59,7 @@ class DatabaseManager:
             CREATE TABLE IF NOT EXISTS goals (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT NOT NULL,
-                target_amount REAL NOT NULL,
+                target_amount DECIMAL NOT NULL,
                 target_date TEXT,
                 description TEXT,
                 pocket_id INTEGER NOT NULL,
@@ -62,7 +69,7 @@ class DatabaseManager:
             CREATE TABLE IF NOT EXISTS goal_contributions (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 goal_id INTEGER NOT NULL,
-                amount REAL NOT NULL,
+                amount DECIMAL NOT NULL,
                 date TEXT NOT NULL,
                 note TEXT NOT NULL DEFAULT '',
                 FOREIGN KEY (goal_id) REFERENCES goals(id) ON DELETE CASCADE
@@ -70,7 +77,7 @@ class DatabaseManager:
 
             CREATE TABLE IF NOT EXISTS net_worth_snapshots (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                amount REAL NOT NULL,
+                amount DECIMAL NOT NULL,
                 date TEXT NOT NULL,
                 note TEXT NOT NULL DEFAULT ''
             );

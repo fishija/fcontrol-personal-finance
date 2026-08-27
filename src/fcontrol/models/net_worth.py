@@ -1,10 +1,12 @@
 from dataclasses import dataclass
+from decimal import Decimal
+
 from fcontrol.db_manager import DatabaseManager
 
 
 @dataclass
 class NetWorthSnapshot:
-    amount: float
+    amount: Decimal
     date: str
     note: str = ""
     id: int | None = None
@@ -21,7 +23,7 @@ class NetWorthSnapshotRepository:
         return [
             NetWorthSnapshot(
                 id=r["id"],
-                amount=r["amount"],
+                amount=Decimal(str(r["amount"])),
                 date=r["date"],
                 note=r["note"],
             )
@@ -36,7 +38,7 @@ class NetWorthSnapshotRepository:
         if row:
             return NetWorthSnapshot(
                 id=row["id"],
-                amount=row["amount"],
+                amount=Decimal(str(row["amount"])),
                 date=row["date"],
                 note=row["note"],
             )

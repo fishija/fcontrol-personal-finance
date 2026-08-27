@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from fcontrol.models import (
     Transaction,
     TransactionCategory,
@@ -43,7 +45,7 @@ class TransactionService:
 
     def add_transaction(
         self,
-        amount: float,
+        amount: Decimal,
         pocket_id: int,
         transaction_type: TransactionType,
         source: TransactionSource,
